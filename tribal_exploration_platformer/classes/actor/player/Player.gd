@@ -33,6 +33,18 @@ func jump(_refreshJumpExtention:bool = true):
 	self.buffer.consume(BUFFER.ON_GROUND)
 	if _refreshJumpExtention:
 		self.buffer.insert(BUFFER.JUMP_EXTENTION, self.stats.physics.jumpExtentionTime)
+		
+func wallJump(_refreshJumpExtention:bool = true):
+	jump(_refreshJumpExtention)
+	var _dir = 1
+	if self.direction == DIRECTION.LEFT:
+		_dir *= -1
+	self.velocity.x = -1 * _dir * self.stats.physics.topSpeed
+	if self.direction == DIRECTION.LEFT: self.setDirection(DIRECTION.RIGHT)
+	else: self.setDirection(DIRECTION.LEFT)
+	self.buffer.consume(BUFFER.WALLRUN_DIRECTION_CANCEL)
+	self.buffer.consume(BUFFER.WALLRUN_EXIT)
+	self.buffer.insert(BUFFER.WALLRUN_EXIT, 0.1)
 
 func applyGravity(delta:float = 1.0):
 	if is_on_floor():
@@ -63,19 +75,14 @@ func _state_movement_process(delta:float):
 	handleHorizontalMovement(_inputVector, delta)
 	applyGravity(delta)
 	# Jumping
-	if is_on_floor() or self.buffer.check(BUFFER.ON_GROUND) or self.buffer.check(BUFFER.WALLRUN_DIRECTION_CANCEL):
+	if is_on_floor() or self.buffer.check(BUFFER.ON_GROUND):
 		if InputExt.is_action_just_pressed("act_jump"):
 			jump()
-			if self.buffer.consume(BUFFER.WALLRUN_DIRECTION_CANCEL):
-				var _dir = 1
-				if direction == DIRECTION.LEFT:
-					_dir *= -1
-				self.velocity.x = -1 * _dir * self.stats.physics.topSpeed
-				if self.direction == DIRECTION.LEFT: self.setDirection(DIRECTION.RIGHT)
-				else: self.setDirection(DIRECTION.LEFT)
-				self.buffer.consume(BUFFER.WALLRUN_EXIT)
-				self.buffer.insert(BUFFER.WALLRUN_EXIT, 0.1)
 	else:
+		if (InputExt.is_action_just_pressed("act_jump")
+		and (not self.buffer.check(BUFFER.WALLRUN_EXIT) or self.buffer.check(BUFFER.WALLRUN_DIRECTION_CANCEL))
+		and (self.buffer.check(BUFFER.WALLRUN_DIRECTION_CANCEL) or $WallChecker.touchesWall())):
+			wallJump()
 		if self.buffer.check(BUFFER.JUMP_EXTENTION) and Input.is_action_pressed("act_jump"):
 			velocity.y -= CONSTANTS.PHYSICS.GRAVITY.y * self.stats.physics.gravityMultiplier * delta * self.stats.physics.jumpExtentionPower
 		else:
@@ -132,15 +139,8 @@ func _state_wallrun_process(delta):
 		self.buffer.insert(BUFFER.WALLRUN_EXIT, 2.0)
 		return
 	if Input.is_action_just_pressed("act_jump"):
-		var _dir = 1
-		if direction == DIRECTION.LEFT:
-			_dir *= -1
-		self.velocity.x = -1 * _dir * self.stats.physics.topSpeed
-		if self.direction == DIRECTION.LEFT: self.setDirection(DIRECTION.RIGHT)
-		else: self.setDirection(DIRECTION.LEFT)
-		jump()
+		wallJump()
 		self.stateMachine.setState(STATE.MOVEMENT)
-		self.buffer.insert(BUFFER.WALLRUN_EXIT, 0.1)
 		return
 	var _inputDir = InputExt.getInputVector()
 	if (self.direction == DIRECTION.LEFT and _inputDir.x >= 0 or self.direction == DIRECTION.RIGHT and _inputDir.x <= 0):

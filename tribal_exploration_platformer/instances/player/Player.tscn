@@ -624,6 +624,11 @@ script/source = "extends AnimationPlayer
 
 export var skeleton:NodePath
 
+func _ready():
+	var player = get_node(self.root_node)
+	# Animation Blend Times
+	# self.set_blend_time(player.animationDict[player.ANIMATION.WALL_RUNNING], player.animationDict[player.ANIMATION.IN_AIR], 0.5)
+
 func play(name: String = \"\", custom_blend: float = -1, custom_speed: float = 1.0, from_end: bool = false) -> void:
 	if name == current_animation:
 		return
