@@ -11,6 +11,7 @@ var USERTESTDATA = preload('res://classes/database/userTest/UserTestData.gd')
 func _ready():
 	var COLORS = [Color(\"1929d2\"), Color(\"ac0707\"), Color(\"8e27b8\"), Color(\"d2cf19\"), Color(\"008d19\"), Color(\"cf6b00\")]
 	var rng = RandomNumberGenerator.new()
+	rng.randomize()
 	var mat = $Player.material
 	mat.set_shader_param(\"eye_color\", COLORS[rng.randi_range(0, len(COLORS) - 1)])
 	mat.set_shader_param(\"secondary_color\", COLORS[rng.randi_range(0, len(COLORS) - 1)])
@@ -127,7 +128,7 @@ script = SubResource( 11 )
 position = Vector2( 31.7062, 22.0002 )
 
 [node name="Sprite" type="Sprite" parent="."]
-self_modulate = Color( 0.635294, 0.819608, 0.780392, 1 )
+self_modulate = Color( 0.309804, 0.411765, 0.388235, 1 )
 position = Vector2( 2747.12, 30.2533 )
 scale = Vector2( 99.1895, 25.909 )
 z_index = -4096
