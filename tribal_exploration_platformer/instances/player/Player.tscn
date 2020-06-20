@@ -1,0 +1,899 @@
+[gd_scene load_steps=27 format=2]
+
+[ext_resource path="res://classes/actor/player/Player.gd" type="Script" id=1]
+[ext_resource path="res://assets/sprites/creatures/humans/bodies/survivor_cape/leg_lower.png" type="Texture" id=2]
+[ext_resource path="res://assets/sprites/creatures/humans/head.png" type="Texture" id=3]
+[ext_resource path="res://assets/sprites/creatures/humans/bodies/survivor_cape/mask.png" type="Texture" id=4]
+[ext_resource path="res://assets/sprites/creatures/humans/bodies/survivor_cape/torso.png" type="Texture" id=5]
+[ext_resource path="res://assets/sprites/creatures/humans/bodies/survivor_cape/arm_upper.png" type="Texture" id=6]
+[ext_resource path="res://assets/sprites/creatures/humans/bodies/survivor_cape/leg_upper.png" type="Texture" id=7]
+[ext_resource path="res://instances/player/PlayerMaterial.tres" type="Material" id=8]
+[ext_resource path="res://assets/sprites/creatures/humans/hair/middle_long_front.png" type="Texture" id=9]
+[ext_resource path="res://assets/sprites/creatures/humans/hair/middle_long_back.png" type="Texture" id=10]
+[ext_resource path="res://assets/sprites/creatures/humans/expressions/expressions_2.png" type="Texture" id=11]
+[ext_resource path="res://assets/sprites/creatures/humans/bodies/survivor_cape/torso_front.png" type="Texture" id=12]
+[ext_resource path="res://assets/sprites/creatures/humans/bodies/survivor_cape/cape.png" type="Texture" id=13]
+[ext_resource path="res://assets/sprites/creatures/humans/bodies/survivor_cape/arm_lower.png" type="Texture" id=14]
+[ext_resource path="res://assets/sprites/items/weapons/handguns/cheapskate.png" type="Texture" id=15]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 8, 22 )
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends Skeleton2D
+
+export var root:NodePath
+
+func _ready():
+	get_node(root).connect(\"direction_changed\", self, \"_on_player_direction_changed\")
+
+func reset():
+	for _boneId in range(get_bone_count()):
+		get_bone(_boneId).apply_rest()
+		
+func _on_player_direction_changed(newDirection):
+	if newDirection == Player.DIRECTION.LEFT:
+		self.scale.x = -1 * abs(self.scale.x)
+	else:
+		self.scale.x = abs(self.scale.x)
+"
+
+[sub_resource type="GDScript" id=3]
+script/source = "tool
+extends Sprite
+
+enum EXPRESSION { NEUTRAL, BLINKING, HURT }
+
+export var blinkInterval:float = 5.0 setget setBlinkInterval
+export var blinkDuration:float = 0.2 setget setBlinkDuration
+export(EXPRESSION) var expression:int = EXPRESSION.NEUTRAL setget setExpression
+
+var currentBlinkTime:float = 0.0
+
+func setExpression(_expression):
+	expression = _expression
+	match expression:
+		EXPRESSION.NEUTRAL:
+			self.frame = 0
+			self.currentBlinkTime = self.blinkInterval
+		EXPRESSION.BLINKING:
+			self.frame = 1
+			self.currentBlinkTime = self.blinkDuration
+		EXPRESSION.HURT:
+			self.frame = 2
+	
+func setBlinkInterval(_blinkInterval):
+	blinkInterval = _blinkInterval
+	
+func setBlinkDuration(_blinkDuration):
+	blinkDuration = _blinkDuration
+
+func _physics_process(delta):
+	match expression:
+		EXPRESSION.NEUTRAL:
+			self.currentBlinkTime -= delta
+			if self.currentBlinkTime <= 0:
+				self.expression = EXPRESSION.BLINKING
+		EXPRESSION.BLINKING:
+			self.currentBlinkTime -= delta
+			if self.currentBlinkTime <= 0:
+				self.expression = EXPRESSION.NEUTRAL
+"
+
+[sub_resource type="GDScript" id=4]
+script/source = "extends Bone2D
+
+export var rootNode:NodePath
+export var maxRotationOffset:float = 30
+
+var parent
+var skeleton
+var rotationOffset = 0
+
+func _ready():
+	self.parent = get_node(rootNode)
+	self.skeleton = parent.get_node('Skeleton2D')
+	$Tween.interpolate_property(self, \"rotationOffset\", deg2rad(-1 * maxRotationOffset), deg2rad(maxRotationOffset), 1.0, Tween.TRANS_CUBIC)
+
+func _physics_process(delta):
+	$Tween.seek(0.5 + (sign(parent.velocity.x) * min(abs(parent.velocity.x) / parent.stats.physics.topSpeed, 1.0) * self.skeleton.scale.x) / 2)
+	self.rotation = -1 * $\"..\".rotation + deg2rad(90) + rotationOffset
+"
+
+[sub_resource type="GDScript" id=5]
+script/source = "extends Bone2D
+
+export var rootNode:NodePath
+export var maxRotationOffset:float = 30
+
+var parent
+var skeleton
+var rotationOffset = 0
+
+func _ready():
+	self.parent = get_node(rootNode)
+	self.skeleton = parent.get_node('Skeleton2D')
+	$Tween.interpolate_property(self, \"rotationOffset\", deg2rad(-1 * maxRotationOffset), deg2rad(maxRotationOffset), 1.0, Tween.TRANS_CUBIC)
+
+func _physics_process(delta):
+	$Tween.seek(0.5 + (sign(parent.velocity.x) * min(abs(parent.velocity.x) / parent.stats.physics.topSpeed, 1.0) * self.skeleton.scale.x) / 2)
+	self.rotation = -1 * $\"..\".rotation + deg2rad(90) + rotationOffset
+"
+
+[sub_resource type="Animation" id=6]
+length = 4.0
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Skeleton2D/Torso/MainLeg:rotation_degrees")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ 168.487, 169.021 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Skeleton2D/Torso/MainLeg/LowerLeg:rotation_degrees")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 11.0568 ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Skeleton2D/Torso:position")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0.2 ), Vector2( 0, 0.1 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Skeleton2D/Torso/OffLeg:rotation_degrees")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ 168.5, 169.0 ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("Skeleton2D/Torso/OffLeg/LowerLeg:rotation_degrees")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 11.1 ]
+}
+tracks/5/type = "value"
+tracks/5/path = NodePath("Skeleton2D/Torso/MainArm:rotation_degrees")
+tracks/5/interp = 2
+tracks/5/loop_wrap = true
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/keys = {
+"times": PoolRealArray( 0, 2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ 193.303, 200.0 ]
+}
+tracks/6/type = "value"
+tracks/6/path = NodePath("Skeleton2D/Torso/MainArm/LowerArm:rotation_degrees")
+tracks/6/interp = 2
+tracks/6/loop_wrap = true
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/keys = {
+"times": PoolRealArray( 0, 2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ -19.2267, -24.0 ]
+}
+tracks/7/type = "value"
+tracks/7/path = NodePath("Skeleton2D/Torso/OffArm/LowerArm:rotation_degrees")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/keys = {
+"times": PoolRealArray( 0, 2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ -19.2, -22.8123 ]
+}
+tracks/8/type = "value"
+tracks/8/path = NodePath("Skeleton2D/Torso/OffArm:rotation_degrees")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/keys = {
+"times": PoolRealArray( 0, 2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ 193.3, 182.428 ]
+}
+
+[sub_resource type="Animation" id=7]
+length = 1.2
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Skeleton2D/Torso/Head:rotation_degrees")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ 74.5278, 100.276 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Skeleton2D/Torso/MainLeg:rotation_degrees")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ -253.146, -204.344 ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Skeleton2D/Torso/MainLeg/LowerLeg:rotation_degrees")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ 101.073, 89.4181 ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Skeleton2D/Torso/OffLeg:rotation_degrees")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ -167.883, -206.873 ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("Skeleton2D/Torso/OffLeg/LowerLeg:rotation_degrees")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ -6.42931, 65.0753 ]
+}
+tracks/5/type = "value"
+tracks/5/path = NodePath("Skeleton2D/Torso/MainArm:rotation_degrees")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ -167.995, -151.802 ]
+}
+tracks/6/type = "value"
+tracks/6/path = NodePath("Skeleton2D/Torso/MainArm/LowerArm:rotation_degrees")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ -13.662, -16.2298 ]
+}
+tracks/7/type = "value"
+tracks/7/path = NodePath("Skeleton2D/Torso/OffArm:rotation_degrees")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ -189.283, -200.08 ]
+}
+tracks/8/type = "value"
+tracks/8/path = NodePath("Skeleton2D/Torso/OffArm/LowerArm:rotation_degrees")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ 5.46189, -16.3569 ]
+}
+
+[sub_resource type="Animation" id=8]
+length = 0.6
+loop = true
+step = 0.05
+tracks/0/type = "value"
+tracks/0/path = NodePath("Skeleton2D/Torso/Head:rotation_degrees")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 84.1787 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Skeleton2D/Torso:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 0, 1.222 ), Vector2( 0, -0.087 ), Vector2( 0, 1.837 ), Vector2( 0, 0.452 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Skeleton2D/Torso:rotation_degrees")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ -83.6434 ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Skeleton2D/Torso/OffLeg:rotation_degrees")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ 139.531, 174.67, 236.157, 174.922 ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("Skeleton2D/Torso/OffLeg/LowerLeg:rotation_degrees")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ 33.6098, -1.52931, 61.6737, 110.02 ]
+}
+tracks/5/type = "value"
+tracks/5/path = NodePath("Skeleton2D/Torso/MainLeg/LowerLeg:rotation_degrees")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ 44.4421, 94.274, 34.5259, 2.56556 ]
+}
+tracks/6/type = "value"
+tracks/6/path = NodePath("Skeleton2D/Torso/MainLeg:rotation_degrees")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ 211.195, 157.88, 138.495, 171.065 ]
+}
+tracks/7/type = "value"
+tracks/7/path = NodePath("Skeleton2D/Torso/MainArm:rotation_degrees")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ 157.609, 190.506, 224.56, 172.038 ]
+}
+tracks/8/type = "value"
+tracks/8/path = NodePath("Skeleton2D/Torso/MainArm/LowerArm:rotation_degrees")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ -65.1019, -77.2171, -17.1998, -61.2058 ]
+}
+tracks/9/type = "value"
+tracks/9/path = NodePath("Skeleton2D/Torso/OffArm:rotation_degrees")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ 240.985, 206.874, 169.304, 216.286 ]
+}
+tracks/10/type = "value"
+tracks/10/path = NodePath("Skeleton2D/Torso/OffArm/LowerArm:rotation_degrees")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ -15.7554, -47.1754, -68.162, -42.4034 ]
+}
+
+[sub_resource type="Animation" id=9]
+resource_name = "wall_run"
+length = 0.6
+loop = true
+step = 0.05
+tracks/0/type = "value"
+tracks/0/path = NodePath("Skeleton2D/Torso/Head:rotation_degrees")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 84.1787 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Skeleton2D/Torso:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( -8, 1.222 ), Vector2( -10, -0.087 ), Vector2( -8, 1.837 ), Vector2( -6, 0.452 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Skeleton2D/Torso:rotation_degrees")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ -133.6 ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Skeleton2D/Torso/OffLeg:rotation_degrees")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ 99.5, 134.7, 196.2, 134.9 ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("Skeleton2D/Torso/OffLeg/LowerLeg:rotation_degrees")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ 33.6098, -1.52931, 61.6737, 110.02 ]
+}
+tracks/5/type = "value"
+tracks/5/path = NodePath("Skeleton2D/Torso/MainLeg/LowerLeg:rotation_degrees")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ 44.4421, 94.274, 34.5259, 2.56556 ]
+}
+tracks/6/type = "value"
+tracks/6/path = NodePath("Skeleton2D/Torso/MainLeg:rotation_degrees")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ 171.2, 117.9, 98.5, 131.1 ]
+}
+tracks/7/type = "value"
+tracks/7/path = NodePath("Skeleton2D/Torso/MainArm:rotation_degrees")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ 157.609, 190.506, 224.56, 172.038 ]
+}
+tracks/8/type = "value"
+tracks/8/path = NodePath("Skeleton2D/Torso/MainArm/LowerArm:rotation_degrees")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ -65.1019, -77.2171, -17.1998, -61.2058 ]
+}
+tracks/9/type = "value"
+tracks/9/path = NodePath("Skeleton2D/Torso/OffArm:rotation_degrees")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ 240.985, 206.874, 169.304, 216.286 ]
+}
+tracks/10/type = "value"
+tracks/10/path = NodePath("Skeleton2D/Torso/OffArm/LowerArm:rotation_degrees")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/keys = {
+"times": PoolRealArray( 0, 0.15, 0.3, 0.45 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ -15.7554, -47.1754, -68.162, -42.4034 ]
+}
+
+[sub_resource type="GDScript" id=10]
+script/source = "extends AnimationPlayer
+
+export var skeleton:NodePath
+
+func play(name: String = \"\", custom_blend: float = -1, custom_speed: float = 1.0, from_end: bool = false) -> void:
+	if name == current_animation:
+		return
+	get_node(skeleton).reset()
+	.play(name, custom_blend, custom_speed, from_end)
+"
+
+[sub_resource type="GDScript" id=11]
+script/source = "extends Node2D
+
+export var root:NodePath
+export var distance:int
+
+var player
+var mainCasts:Array = []
+
+func _ready():
+	self.mainCasts = [$UpperWallCheck, $WallCheck, $LowerWallCheck]
+	for cast in self.mainCasts:
+		cast.cast_to = Vector2(distance, 0)
+	self.player = get_node(root)
+	self.player.connect(\"direction_changed\", self, \"_on_player_direction_changed\")
+		
+func touchesWall() -> bool:
+	for cast in self.mainCasts:
+		if cast.is_colliding():
+			return true
+	return false
+	
+func _on_player_direction_changed(newDirection):
+	var _distance = distance
+	if newDirection == Player.DIRECTION.LEFT:
+		_distance *= -1
+	for cast in self.mainCasts:
+		cast.cast_to = Vector2(_distance, 0)
+"
+
+[node name="Player" type="KinematicBody2D"]
+material = ExtResource( 8 )
+script = ExtResource( 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+position = Vector2( 0, -4 )
+shape = SubResource( 1 )
+
+[node name="Skeleton2D" type="Skeleton2D" parent="."]
+script = SubResource( 2 )
+root = NodePath("..")
+
+[node name="Torso" type="Bone2D" parent="Skeleton2D"]
+position = Vector2( 0, 0.2 )
+rotation = -1.5708
+rest = Transform2D( -3.61999e-06, -1, 1, -3.61999e-06, 0, 0.2 )
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Torso"]
+material = ExtResource( 8 )
+texture = ExtResource( 5 )
+offset = Vector2( 6, 0 )
+
+[node name="FrontSprite" type="Sprite" parent="Skeleton2D/Torso"]
+material = ExtResource( 8 )
+z_index = 5
+texture = ExtResource( 12 )
+offset = Vector2( 12, -1 )
+
+[node name="Head" type="Bone2D" parent="Skeleton2D/Torso"]
+position = Vector2( 20, 7.24792e-05 )
+rotation = 1.5708
+z_index = 6
+rest = Transform2D( -3.61999e-06, 1, -1, -3.61999e-06, 20, 7.24792e-05 )
+default_length = 8.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Torso/Head"]
+material = ExtResource( 8 )
+texture = ExtResource( 3 )
+offset = Vector2( 1, -1 )
+
+[node name="Expression" type="Sprite" parent="Skeleton2D/Torso/Head"]
+material = ExtResource( 8 )
+z_index = 2
+texture = ExtResource( 11 )
+offset = Vector2( 1, -1 )
+hframes = 3
+script = SubResource( 3 )
+blinkInterval = 5.0
+blinkDuration = 0.2
+expression = 0
+
+[node name="HairSpriteFront" type="Sprite" parent="Skeleton2D/Torso/Head"]
+material = ExtResource( 8 )
+position = Vector2( -1.99999, -4.00001 )
+z_index = 1
+texture = ExtResource( 9 )
+offset = Vector2( 3, 2 )
+
+[node name="Accessory" type="Sprite" parent="Skeleton2D/Torso/Head"]
+material = ExtResource( 8 )
+z_index = 5
+texture = ExtResource( 4 )
+offset = Vector2( 1, 0 )
+
+[node name="BackHair" type="Bone2D" parent="Skeleton2D/Torso/Head"]
+position = Vector2( -3.57628e-06, 1 )
+z_index = -5
+rest = Transform2D( 1, 0, 0, 1, -3.57628e-06, 1 )
+default_length = 1.0
+script = SubResource( 4 )
+rootNode = NodePath("../../../..")
+maxRotationOffset = 15.0
+
+[node name="HairSpriteBack" type="Sprite" parent="Skeleton2D/Torso/Head/BackHair"]
+material = ExtResource( 8 )
+z_index = -4
+texture = ExtResource( 10 )
+offset = Vector2( -1, 10 )
+
+[node name="Tween" type="Tween" parent="Skeleton2D/Torso/Head/BackHair"]
+
+[node name="MainArm" type="Bone2D" parent="Skeleton2D/Torso"]
+position = Vector2( 11, -4.99996 )
+rotation = 3.37377
+z_index = 4
+rest = Transform2D( -0.973168, -0.230097, 0.230097, -0.973168, 11, -4.99996 )
+default_length = 8.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Torso/MainArm"]
+material = ExtResource( 8 )
+texture = ExtResource( 6 )
+offset = Vector2( 2, 0 )
+
+[node name="LowerArm" type="Bone2D" parent="Skeleton2D/Torso/MainArm"]
+position = Vector2( 6, 2.24113e-05 )
+rotation = -0.335569
+z_index = -1
+rest = Transform2D( 0.944223, -0.329306, 0.329306, 0.944223, 6, 2.24113e-05 )
+default_length = 10.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Torso/MainArm/LowerArm"]
+material = ExtResource( 8 )
+texture = ExtResource( 14 )
+offset = Vector2( 5, 1.5 )
+
+[node name="Weapon" type="Bone2D" parent="Skeleton2D/Torso/MainArm/LowerArm"]
+position = Vector2( 9.5, 0 )
+z_index = -1
+rest = Transform2D( 1, 0, 0, 1, 9.5, 0 )
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Torso/MainArm/LowerArm/Weapon"]
+texture = ExtResource( 15 )
+offset = Vector2( 2.5, -1 )
+
+[node name="OffArm" type="Bone2D" parent="Skeleton2D/Torso"]
+modulate = Color( 0.784314, 0.784314, 0.784314, 1 )
+position = Vector2( 11, 4.00004 )
+rotation = 3.37372
+z_index = -2
+rest = Transform2D( -0.973179, -0.230048, 0.230048, -0.973179, 11, 4.00004 )
+default_length = 8.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Torso/OffArm"]
+material = ExtResource( 8 )
+texture = ExtResource( 6 )
+offset = Vector2( 2, 1 )
+
+[node name="LowerArm" type="Bone2D" parent="Skeleton2D/Torso/OffArm"]
+position = Vector2( 6, 2.24113e-05 )
+rotation = -0.335103
+z_index = -1
+rest = Transform2D( 0.944376, -0.328866, 0.328866, 0.944376, 6, 2.24113e-05 )
+default_length = 10.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Torso/OffArm/LowerArm"]
+material = ExtResource( 8 )
+texture = ExtResource( 14 )
+offset = Vector2( 5, 2.5 )
+
+[node name="MainLeg" type="Bone2D" parent="Skeleton2D/Torso"]
+position = Vector2( -0.999985, -4 )
+rotation = 2.94065
+z_index = 1
+rest = Transform2D( -0.979879, 0.199593, -0.199593, -0.979879, -0.999985, -4 )
+default_length = 8.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Torso/MainLeg"]
+material = ExtResource( 8 )
+texture = ExtResource( 7 )
+offset = Vector2( 3, -1 )
+
+[node name="LowerLeg" type="Bone2D" parent="Skeleton2D/Torso/MainLeg"]
+position = Vector2( 7, 2.47955e-05 )
+rotation = 0.192978
+z_index = -1
+rest = Transform2D( 0.981437, 0.191782, -0.191782, 0.981437, 7, 2.47955e-05 )
+default_length = 8.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Torso/MainLeg/LowerLeg"]
+material = ExtResource( 8 )
+texture = ExtResource( 2 )
+offset = Vector2( 4, 0 )
+
+[node name="OffLeg" type="Bone2D" parent="Skeleton2D/Torso"]
+modulate = Color( 0.784314, 0.784314, 0.784314, 1 )
+self_modulate = Color( 0.784314, 0.784314, 0.784314, 1 )
+position = Vector2( -1.00001, 2 )
+rotation = 2.94088
+z_index = -1
+rest = Transform2D( -0.979925, 0.199368, -0.199368, -0.979925, -1.00001, 2 )
+default_length = 8.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Torso/OffLeg"]
+material = ExtResource( 8 )
+texture = ExtResource( 7 )
+offset = Vector2( 3, 0 )
+
+[node name="LowerLeg" type="Bone2D" parent="Skeleton2D/Torso/OffLeg"]
+position = Vector2( 7, 2.47955e-05 )
+rotation = 0.193732
+z_index = -1
+rest = Transform2D( 0.981293, 0.192522, -0.192522, 0.981293, 7, 2.47955e-05 )
+default_length = 8.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Torso/OffLeg/LowerLeg"]
+material = ExtResource( 8 )
+texture = ExtResource( 2 )
+offset = Vector2( 4, 1 )
+
+[node name="Cape" type="Bone2D" parent="Skeleton2D/Torso"]
+position = Vector2( 12, -1 )
+rotation = -3.14159
+z_index = -2
+rest = Transform2D( -1, -2.53518e-06, 2.53518e-06, -1, 12, -1 )
+default_length = 24.0
+script = SubResource( 5 )
+rootNode = NodePath("../../..")
+maxRotationOffset = 25.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Torso/Cape"]
+material = ExtResource( 8 )
+rotation = 3.14159
+texture = ExtResource( 13 )
+offset = Vector2( -6, 0 )
+
+[node name="Tween" type="Tween" parent="Skeleton2D/Torso/Cape"]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/idle = SubResource( 6 )
+anims/in_air = SubResource( 7 )
+anims/run = SubResource( 8 )
+anims/wall_run = SubResource( 9 )
+script = SubResource( 10 )
+skeleton = NodePath("../Skeleton2D")
+
+[node name="WallChecker" type="Node2D" parent="."]
+visible = false
+script = SubResource( 11 )
+root = NodePath("..")
+distance = 10
+
+[node name="UpperWallCheck" type="RayCast2D" parent="WallChecker"]
+position = Vector2( 0, -22 )
+enabled = true
+cast_to = Vector2( 16, 0 )
+
+[node name="LowerWallCheck" type="RayCast2D" parent="WallChecker"]
+position = Vector2( 0, 14 )
+enabled = true
+cast_to = Vector2( 16, 0 )
+
+[node name="WallCheck" type="RayCast2D" parent="WallChecker"]
+position = Vector2( 0, -4 )
+enabled = true
+cast_to = Vector2( 16, 0 )
