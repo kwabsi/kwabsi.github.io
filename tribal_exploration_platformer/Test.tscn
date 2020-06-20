@@ -9,7 +9,7 @@ script/source = "extends Node2D
 var USERTESTDATA = preload('res://classes/database/userTest/UserTestData.gd')
 
 func _ready():
-	var COLORS = [Color(\"1929d2\"), Color(\"ac0707\"), Color(\"8e27b8\"), Color(\"d2cf19\"), Color(\"008d19\"), Color(\"cf6b00\")]
+	var COLORS = [Color(\"1929d2\"), Color(\"ac0707\"), Color(\"8e27b8\"), Color(\"d2cf19\"), Color(\"008d19\"), Color(\"cf6b00\"), Color(\"ed80d7\")]
 	var rng = RandomNumberGenerator.new()
 	rng.randomize()
 	var mat = $Player.material
