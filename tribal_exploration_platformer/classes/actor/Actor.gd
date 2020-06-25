@@ -1,7 +1,7 @@
 extends KinematicBody2D
 class_name Actor
 
-var stats:Stats = Stats.new()		# All variable properties of the actor
+var stats:ActorStats = ActorStats.new()		# All variable properties of the actor
 
 var entryState = -1
 var stateMachine:StateMachine = StateMachine.new(self)
@@ -79,20 +79,3 @@ func _state_ragdoll(delta):
 	performMovement(delta)
 	if ragdollTimer.time_left == 0 and velocity.length() < stats.physics.launchThreshold:
 		self.stateMachine.setState(entryState)
-	
-class PhysicsProperties:
-	var weight:float = 1.0				# Used for Launch-Mechanics
-	var gravityMultiplier:float = 1.0
-	var friction:float = 64.0
-	var airMultiplicator:float = 0.2
-	var launchThreshold:float = 64.0
-	
-	func loadFromJSON(_json:Dictionary):
-		self.weight = _json.get("weight", weight)
-		self.gravityMultiplier = _json.get("gravityMultiplier", gravityMultiplier)
-		self.friction = _json.get("friction", friction)
-		self.airMultiplicator = _json.get("airMultiplicator", airMultiplicator)
-		self.launchThreshold = _json.get("launchThreshold", launchThreshold)
-
-class Stats:
-	var physics:PhysicsProperties = PhysicsProperties.new()

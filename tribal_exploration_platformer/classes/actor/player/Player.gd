@@ -2,8 +2,9 @@ extends Actor
 class_name Player
 
 signal direction_changed(newDirection)
+signal state_changed(newState, oldState)
 
-enum STATE { MOVEMENT, WALL_RUN }
+enum STATE { MOVEMENT, WALL_RUN, AIMING }
 
 enum BUFFER { ON_GROUND, JUMP_EXTENTION, WALLRUN_EXIT, WALLRUN_DIRECTION_CANCEL }
 const PHYSICS_BUFFER_LENGTH = 0.2
@@ -22,9 +23,12 @@ var direction setget setDirection
 
 func _init():
 	self.entryState = STATE.MOVEMENT
-	self.stats = PlayerStats.new()
+	self.stats = PlayerStats.new().fromJSON({
+		"attributes": { ActorStats.ATTRIBUTES.BRAWN: 1 },
+	})
 
 func _ready():
+	self.stateMachine.connect("state_changed", self, "_propagate_state_change_signal")
 	self.stateMachine.registerState(STATE.MOVEMENT, funcref(self, "_state_movement_process"))
 	self.stateMachine.registerState(STATE.WALL_RUN, funcref(self, "_state_wallrun_process"), funcref(self, "_state_wallrun_enter"))
 
@@ -79,7 +83,7 @@ func _state_movement_process(delta:float):
 		if InputExt.is_action_just_pressed("act_jump"):
 			jump()
 	else:
-		if (InputExt.is_action_just_pressed("act_jump")
+		if (Input.is_action_just_pressed("act_jump") and not self.buffer.check(BUFFER.JUMP_EXTENTION)
 		and (not self.buffer.check(BUFFER.WALLRUN_EXIT) or self.buffer.check(BUFFER.WALLRUN_DIRECTION_CANCEL))
 		and (self.buffer.check(BUFFER.WALLRUN_DIRECTION_CANCEL) or $WallChecker.touchesWall())):
 			wallJump()
@@ -156,3 +160,6 @@ func setDirection(_direction):
 		direction = _direction
 		emit_signal("direction_changed", direction)
 
+# SIGNALS
+func _propagate_state_change_signal(newState, oldState):
+	emit_signal("state_changed", newState, oldState)
