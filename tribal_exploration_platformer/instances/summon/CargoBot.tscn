@@ -1,0 +1,144 @@
+[gd_scene load_steps=16 format=2]
+
+[ext_resource path="res://classes/actor/summon/Summon.gd" type="Script" id=1]
+[ext_resource path="res://assets/sprites/creatures/summons/cargo_bot/cargo_bot_body.png" type="Texture" id=2]
+[ext_resource path="res://assets/sprites/creatures/summons/cargo_bot/cargo_bot_cargo_shute.png" type="Texture" id=3]
+[ext_resource path="res://classes/actor/summon/SummonSkeleton.gd" type="Script" id=4]
+[ext_resource path="res://assets/sprites/creatures/summons/cargo_bot/cargo_bot_claw_connector.png" type="Texture" id=5]
+[ext_resource path="res://assets/sprites/creatures/summons/cargo_bot/cargo_bot_cargo_claw_upper.png" type="Texture" id=6]
+[ext_resource path="res://assets/sprites/creatures/summons/cargo_bot/cargo_bot_cargo_claw_lower.png" type="Texture" id=7]
+[ext_resource path="res://assets/sprites/creatures/summons/cargo_bot/cargo_bot_cargo_eyebrow_upper.png" type="Texture" id=8]
+[ext_resource path="res://assets/sprites/creatures/summons/cargo_bot/cargo_bot_cargo_eyebrow_lower.png" type="Texture" id=9]
+[ext_resource path="res://assets/sprites/creatures/summons/cargo_bot/cargo_bot_cargo_eye.png" type="Texture" id=10]
+[ext_resource path="res://assets/sprites/creatures/summons/cargo_bot/cargo_bot_cargo_sucker_lower.png" type="Texture" id=11]
+[ext_resource path="res://assets/sprites/creatures/summons/cargo_bot/cargo_bot_cargo_sucker_upper.png" type="Texture" id=12]
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 8.0
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends Bone2D
+
+func _process(_delta):
+	$Line2D.points[1] = $Claw.position
+"
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends Bone2D
+
+func _process(_delta):
+	$Line2D.points[0] = $Upper.position
+	$Line2D.points[1] = $Lower.position
+"
+
+[node name="CargoBot" type="KinematicBody2D"]
+collision_layer = 8
+script = ExtResource( 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 0.0310249, -0.0310259 )
+shape = SubResource( 1 )
+
+[node name="Skeleton2D" type="Skeleton2D" parent="."]
+script = ExtResource( 4 )
+
+[node name="Body" type="Bone2D" parent="Skeleton2D"]
+rest = Transform2D( 1, 0, 0, 1, 0, 0 )
+default_length = 8.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Body"]
+texture = ExtResource( 2 )
+
+[node name="Shute" type="Bone2D" parent="Skeleton2D/Body"]
+rotation = -1.5708
+rest = Transform2D( -4.37114e-08, -1, 1, -4.37114e-08, 0, 0 )
+default_length = 8.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Body/Shute"]
+rotation = 1.5708
+z_index = -1
+texture = ExtResource( 3 )
+offset = Vector2( -3.2, -1 )
+
+[node name="Arm" type="Bone2D" parent="Skeleton2D/Body"]
+position = Vector2( -3.5, 0.961672 )
+rest = Transform2D( 1, 0, 0, 1, -3.5, 0.961672 )
+default_length = 8.0
+script = SubResource( 2 )
+
+[node name="Line2D" type="Line2D" parent="Skeleton2D/Body/Arm"]
+points = PoolVector2Array( 0, 0, 2, 0 )
+width = 2.0
+texture = ExtResource( 5 )
+texture_mode = 2
+begin_cap_mode = 1
+
+[node name="Claw" type="Bone2D" parent="Skeleton2D/Body/Arm"]
+position = Vector2( -16.1222, -12.01 )
+rest = Transform2D( 1, 0, 0, 1, -7.32058, 4.86761 )
+
+[node name="Upper" type="Bone2D" parent="Skeleton2D/Body/Arm/Claw"]
+position = Vector2( 0, -0.0383282 )
+z_index = 1
+rest = Transform2D( 1, 0, 0, 1, 0, -0.0383282 )
+default_length = 8.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Body/Arm/Claw/Upper"]
+texture = ExtResource( 6 )
+offset = Vector2( 4, -1 )
+
+[node name="Lower" type="Bone2D" parent="Skeleton2D/Body/Arm/Claw"]
+rest = Transform2D( 1, 0, 0, 1, 0, 0 )
+default_length = 4.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Body/Arm/Claw/Lower"]
+texture = ExtResource( 7 )
+offset = Vector2( 3, 1.5 )
+
+[node name="Eye" type="Bone2D" parent="Skeleton2D/Body"]
+position = Vector2( 4.7, 0 )
+rest = Transform2D( 1, 0, 0, 1, 4.7, 0 )
+default_length = 1.0
+script = SubResource( 3 )
+
+[node name="Line2D" type="Line2D" parent="Skeleton2D/Body/Eye"]
+points = PoolVector2Array( 0, -2.5, 0, 2.5 )
+width = 2.0
+default_color = Color( 1, 1, 1, 1 )
+texture = ExtResource( 10 )
+texture_mode = 2
+
+[node name="Upper" type="Bone2D" parent="Skeleton2D/Body/Eye"]
+position = Vector2( 0, -2.5 )
+rest = Transform2D( 1, 0, 0, 1, 0, -2.5 )
+default_length = 1.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Body/Eye/Upper"]
+texture = ExtResource( 8 )
+
+[node name="Lower" type="Bone2D" parent="Skeleton2D/Body/Eye"]
+position = Vector2( 0, 2.5 )
+rest = Transform2D( 1, 0, 0, 1, 0, 2.5 )
+default_length = 1.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Body/Eye/Lower"]
+texture = ExtResource( 9 )
+
+[node name="Sucker" type="Bone2D" parent="Skeleton2D/Body"]
+z_index = -2
+rest = Transform2D( 1, 0, 0, 1, 0, 0 )
+default_length = 8.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Body/Sucker"]
+texture = ExtResource( 11 )
+offset = Vector2( 4, 0 )
+
+[node name="SuckerExtention" type="Bone2D" parent="Skeleton2D/Body/Sucker"]
+position = Vector2( 6, 0 )
+z_index = -1
+rest = Transform2D( 1, 0, 0, 1, 6, 0 )
+default_length = 12.0
+
+[node name="Sprite" type="Sprite" parent="Skeleton2D/Body/Sucker/SuckerExtention"]
+texture = ExtResource( 12 )
+offset = Vector2( 6, 0 )

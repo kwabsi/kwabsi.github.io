@@ -65,7 +65,7 @@ func _on_instance_entered_tree():
 	self.instance.add_child(self)
 
 class State:
-	var onEnter:FuncRef = null			# func(oldStateId or -1) -> GDScriptFunctionState or null
+	var onEnter:FuncRef = null		# func(oldStateId or -1) -> GDScriptFunctionState or null
 	var onProcess:FuncRef = null		# func(delta) -> null
 	var onExit:FuncRef = null			# func(nextStateId or -1) -> GDScriptFunctionState or null
 	
