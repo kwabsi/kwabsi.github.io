@@ -1,0 +1,54 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+export var planetSmoothness:int = 32
+export var dirtColor:Color = Color.brown
+
+var radius:float = 32.0 setget setRadius
+
+var worldPolygon:PoolVector2Array = PoolVector2Array()
+
+func setRadius(_radius):
+	radius = _radius
+	self.update()
+
+func recalculatePolygons():
+	worldPolygon = PoolVector2Array()
+	self.radius = ((CONSTANTS.NODE_DISTANCE * len(GameState.currentNodes)) / 2) / PI
+	for building in GameState.currentNodes:
+		building.updateRadius(self.radius)
+
+func _ready():
+	recalculatePolygons()
+	GameState.connect(\"currentNodesChanged\", self, \"_on_game_currentNodes_changed\")
+
+func _draw():
+	var _points = PoolVector2Array()
+	_points.push_back(Vector2.ZERO)
+	var _colorsDirt = PoolColorArray([dirtColor])
+	for i in range(planetSmoothness + 1):
+		var _anglePoint = deg2rad(i * 360 / self.planetSmoothness - 90)
+		_points.push_back(Vector2(cos(_anglePoint), sin(_anglePoint)) * self.radius)
+	draw_polygon(_points, _colorsDirt)
+	pass
+
+func _on_game_currentNodes_changed():
+	for child in $Nodes.get_children():
+		$Nodes.remove_child(child)
+	for index in range(len(GameState.currentNodes)):
+		var _line = GameState.currentNodes[index].lineNode
+		_line.rotation_degrees = index * (360 / len(GameState.currentNodes))
+		$Nodes.add_child(_line)
+	recalculatePolygons()
+"
+
+[node name="Node2D" type="Node2D"]
+
+[node name="World" type="Node2D" parent="."]
+position = Vector2( 386.43, 184.839 )
+script = SubResource( 1 )
+dirtColor = Color( 0.117647, 0.403922, 0.0823529, 1 )
+
+[node name="Nodes" type="Node2D" parent="World"]
