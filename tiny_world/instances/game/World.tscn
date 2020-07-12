@@ -1,0 +1,58 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+export var planetSmoothness:int = 32
+export var spinSpeed:int = 36
+export var stableColor:Color = Color.green
+export var warningColor:Color = Color.yellow
+export var dangerColor:Color = Color.red
+
+var radius:float = 32.0 setget setRadius
+
+var worldPolygon:PoolVector2Array = PoolVector2Array()
+
+func setRadius(_radius):
+	radius = _radius
+	self.recalculatePolygons()
+	self.update()
+
+func recalculatePolygons():
+	worldPolygon = PoolVector2Array()
+	for building in GameState.currentNodes:
+		building.updateRadius(self.radius)
+
+func _process(delta):
+	self.rotation_degrees = fmod((self.rotation_degrees + (spinSpeed * delta)), 360.0)
+
+func _ready():
+	recalculatePolygons()
+	GameState.connect(\"currentNodes_changed\", self, \"_on_game_currentNodes_changed\")
+	_on_game_currentNodes_changed()
+
+func _draw():
+	var _points = PoolVector2Array()
+	for i in range(planetSmoothness + 1):
+		var _anglePoint = deg2rad(i * 360 / self.planetSmoothness - 90)
+		_points.push_back(Vector2(cos(_anglePoint), sin(_anglePoint)) * self.radius)
+	draw_polygon(_points, PoolColorArray([stableColor]))
+
+func _on_game_currentNodes_changed():
+	for child in $Nodes.get_children():
+		$Nodes.remove_child(child)
+	for index in range(len(GameState.currentNodes)):
+		var _node = GameState.currentNodes[index]
+		$Tween.interpolate_property(_node, \"rotation_degrees\", _node.rotation_degrees, (index * (360 / len(GameState.currentNodes))) + 180, 2.0, Tween.TRANS_SINE)
+		$Nodes.add_child(_node)
+	$Tween.interpolate_method(self, \"setRadius\", self.radius, ((CONSTANTS.NODE_DISTANCE * len(GameState.currentNodes)) / 2) / PI, 2.0, Tween.TRANS_SINE)
+	$Tween.start()
+"
+
+[node name="World" type="Node2D"]
+script = SubResource( 1 )
+planetSmoothness = 64
+
+[node name="Nodes" type="Node2D" parent="."]
+
+[node name="Tween" type="Tween" parent="."]
