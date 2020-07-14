@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://instances/game/World.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/graphics/icons/population.png" type="Texture" id=2]
 [ext_resource path="res://assets/graphics/icons/book.png" type="Texture" id=3]
 [ext_resource path="res://assets/graphics/icons/cash.png" type="Texture" id=4]
+[ext_resource path="res://assets/graphics/houses/village.png" type="Texture" id=5]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
@@ -41,3 +42,8 @@ texture = ExtResource( 4 )
 modulate = Color( 0.376471, 0.384314, 1, 1 )
 position = Vector2( 413.297, 325.501 )
 texture = ExtResource( 3 )
+
+[node name="Node2D" type="Node2D" parent="."]
+
+[node name="Sprite" type="Sprite" parent="Node2D"]
+texture = ExtResource( 5 )

@@ -31,8 +31,13 @@ var parent:BuildingNodeFactory.BuildingNode
 func init(_parent:BuildingNodeFactory.BuildingNode):
 	self.parent = _parent
 	_parent.connect(\"tree_exiting\", self, \"call_deferred\", [\"queue_free\"])
+	reinit()
+
+func reinit():
+	for child in $MainActions.get_children():
+		child.call_deferred(\"queue_free\")
 	for action in actionDict.values():
-		if action.types.find(_parent.type) >= 0:
+		if action.types.find(self.parent.type) >= 0:
 			var _button = TextButton.instance()
 			_button.setText(action.label)
 			$MainActions.add_child(_button)
@@ -78,7 +83,16 @@ func _on_press():
 	setActive(!active)
 
 func _on_build(type, id):
-	print(\"BUILDING \", type, id)
+	var _cost = GameState.getBuildingCost(type, id)
+	if _cost <= GameState.resources.getMaterials():
+		GameState.resources.changeMaterials(-1 * _cost)
+		self.parent.changeBuilding(id, type, GameState.buildingNodeFactory.getBuildingData(type, id))
+		reinit()
+	setActive(false)
+	
+func _on_building_destroy():
+	self.parent.changeBuilding(BuildingNodeFactory.PASTURE.WOODS, BuildingNodeFactory.TYPE.PASTURE, GameState.buildingNodeFactory.getBuildingData(BuildingNodeFactory.TYPE.PASTURE, BuildingNodeFactory.PASTURE.WOODS))
+	reinit()
 	setActive(false)
 
 func _on_mouse_enter():
@@ -335,6 +349,7 @@ margin_bottom = 160.0
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
+alignment = 1
 script = SubResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -344,6 +359,7 @@ __meta__ = {
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
+alignment = 1
 script = SubResource( 4 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -353,6 +369,7 @@ __meta__ = {
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
+alignment = 1
 script = SubResource( 5 )
 __meta__ = {
 "_edit_use_anchors_": false

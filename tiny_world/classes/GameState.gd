@@ -2,9 +2,9 @@ extends Node
 
 signal currentNodes_changed()
 signal zoom_changed()
+signal game_speed_changed(newSpeed)
 
-signal materials_changed()
-signal research_changed()
+signal skills_changed()
 
 var currentNodes:Array = []
 var buildingNodeFactory:BuildingNodeFactory = BuildingNodeFactory.new()
@@ -40,26 +40,70 @@ func hasSkill(skillId:int) -> bool:
 func getBuildingCost(typeId:int, buildingId:int) -> int:
 	var _buildingProps = buildingNodeFactory.getBuildingData(typeId, buildingId)
 	return _buildingProps.cost
+	
+func getPopulation():
+	var _pop = 0
+	for node in currentNodes:
+		if node.properties.housingCapacity > 0:
+			_pop += node.properties.housingCapacity
+	return _pop
+	
+func getMaterials():
+	return self.resources.getMaterials()
+	
+func getResearch():
+	return self.resources.getResearch()
+	
+func getMaterialsPerSecond():
+	var _mps:float = 0.0
+	for node in currentNodes:
+		_mps += node.properties.materialsPerSecond
+	return _mps
+	
+func getResearchPerSecond():
+	var _rps:float = 0.0
+	for node in currentNodes:
+		_rps += node.properties.researchPerSecond
+	return _rps
+	
+func setGameSpeed(_newSpeed):
+	Engine.time_scale = _newSpeed
+	emit_signal("game_speed_changed", _newSpeed)
+
+func destroyNode(_buildingNodeIndex:int):
+	var _building = currentNodes[_buildingNodeIndex]
+	_building.destroy()
+	currentNodes.remove(_buildingNodeIndex)
+	emit_signal("currentNodes_changed")
 
 func _process(_delta):
 	if Input.is_action_just_pressed("ui_up"):
-		currentNodes.append(buildingNodeFactory.build(BuildingNodeFactory.TYPE.HOUSING, BuildingNodeFactory.HOUSING.VILLAGE))
-		emit_signal("currentNodes_changed")
+		restart()
 	if Input.is_action_just_pressed("ui_down"):
-		currentNodes.remove(randi() % len(currentNodes))
-		emit_signal("currentNodes_changed")
+		destroyNode(randi() % len(currentNodes))
 		
-func _init():
-	for i in range(10):
+func restart():
+	self.skillProgress = Progress.new()
+	self.resources = Resources.new(self)
+	for child in currentNodes:
+		child.queue_free()
+	self.currentNodes = []
+	for i in range(StartValues.startNodeCount):
 		currentNodes.append(buildingNodeFactory.build(BuildingNodeFactory.TYPE.PASTURE, BuildingNodeFactory.PASTURE.WOODS))
+	self.zoom = StartValues.startZoom
+	emit_signal("currentNodes_changed")
+	emit_signal("skills_changed")
+
+func _init():
+	restart()
 
 class StartValues extends Object:
-	const startNodeCount:int = 10
-	const startZoom:float = 0.5
+	const startNodeCount:int = 20
+	const startZoom:float = 0.25
 	
 class Resources:
-	var materials:int = 0
-	var _trueMaterials:float = 0.0
+	var materials:int = 10
+	var _trueMaterials:float = 10.0
 	var research:int = 0
 	var _trueResearch:float = 0.0
 	
@@ -72,6 +116,13 @@ class Resources:
 		return materials
 		
 	func changeMaterials(_change:int):
-		materials -= _change
-		_trueMaterials -= _change
+		materials += _change
+		_trueMaterials += _change
+		
+	func getResearch() -> int:
+		return research
+		
+	func changeResearch(_change:int):
+		research += _change
+		_trueResearch += _change
 	

@@ -9,21 +9,21 @@ enum PASTURE { WOODS }
 
 var buildingPropertyDict = {
 	TYPE.HOUSING: {
-		HOUSING.CAMP: BuildingProperty.new(0, 0, 0, 0, 0, ""),
-		HOUSING.VILLAGE: BuildingProperty.new(0, 0, 0, 0, 0, "res://instances/game/houses/Village.tscn"),
-		HOUSING.TOWN: BuildingProperty.new(0, 0, 0, 0, 0, ""),
-		HOUSING.CITY: BuildingProperty.new(0, 0, 0, 0, 0, ""),
-		HOUSING.METROPOLIS: BuildingProperty.new(0, 0, 0, 0, 0, ""),
+		HOUSING.CAMP: BuildingProperty.new(5, 0, 0, 0, 4, "res://instances/game/houses/Camp.tscn"),
+		HOUSING.VILLAGE: BuildingProperty.new(10, 0, 0, 0, 0, "res://instances/game/houses/Village.tscn"),
+		HOUSING.TOWN: BuildingProperty.new(25, 0, 0, 0, 0, ""),
+		HOUSING.CITY: BuildingProperty.new(100, 0, 0, 0, 0, ""),
+		HOUSING.METROPOLIS: BuildingProperty.new(300, 0, 0, 0, 0, ""),
 	},
 	TYPE.PRODUCTION: {
-		PRODUCTION.LUMBERYARD: BuildingProperty.new(0, 0, 0, 0, 0, ""),
+		PRODUCTION.LUMBERYARD: BuildingProperty.new(0, 0, 0, 0, 6, ""),
 		PRODUCTION.MINE: BuildingProperty.new(0, 0, 0, 0, 0, ""),
 		PRODUCTION.REFINERY: BuildingProperty.new(0, 0, 0, 0, 0, ""),
 		PRODUCTION.FACTORY: BuildingProperty.new(0, 0, 0, 0, 0, ""),
 		PRODUCTION.PRODUCTIONPLANT: BuildingProperty.new(0, 0, 0, 0, 0, ""),
 	},
 	TYPE.RESEARCH: {
-		RESEARCH.SCHOOL: BuildingProperty.new(0, 0, 0, 0, 0, ""),
+		RESEARCH.SCHOOL: BuildingProperty.new(0, 0, 0, 0, 11, ""),
 		RESEARCH.MUSEUM: BuildingProperty.new(0, 0, 0, 0, 0, ""),
 		RESEARCH.LIBRARY: BuildingProperty.new(0, 0, 0, 0, 0, ""),
 		RESEARCH.COLLEGE: BuildingProperty.new(0, 0, 0, 0, 0, ""),
@@ -45,25 +45,44 @@ class BuildingNode extends Node2D:
 	var type:int
 	var properties:BuildingProperty
 	var visualNode:Node2D
+	var tween:Tween
 	
 	func _init(_id:int, _type:int, _properties:BuildingProperty):
 		id = _id
 		type = _type
 		setProperties(_properties)
+		tween = Tween.new()
+		add_child(tween)
 		
 	func setProperties(_properties:BuildingProperty):
 		properties = _properties
+		var _newNode = _properties.visualNode.instance()
 		if (visualNode != null):
+			tween.remove_all()
+			_newNode.position = visualNode.position
+			_newNode.rotation = visualNode.rotation
+			tween.interpolate_property(_newNode, "scale", Vector2(1, 0), Vector2.ONE, 1.0, Tween.TRANS_CUBIC)
+			tween.start()
 			visualNode.call_deferred("queue_free")
-		visualNode = _properties.visualNode.instance()
+		visualNode = _newNode
 		self.add_child(visualNode)
 		
 	func updateRadius(_radius:float):
 		visualNode.position = Vector2(0, -1 * (_radius - CONSTANTS.NODE_DISTANCE / 4.0))
 		
 	func getBuildButtonPosition():
+		if !is_inside_tree():
+			return Vector2.ZERO
 		return (((visualNode.global_position - GameState.camera.position) / GameState.camera.zoom) + GameState.camera.position
 			+ Vector2(0, -1 * CONSTANTS.NODE_DISTANCE).rotated(self.global_rotation) / GameState.camera.zoom )
+
+	func changeBuilding(_id:int, _type:int, _properties:BuildingProperty):
+		id = _id
+		type = _type
+		setProperties(_properties)
+		
+	func destroy():
+		call_deferred("queue_free")
 
 class BuildingProperty:
 	var housingCapacity:int = 0			# Negative means, that this many people can work there
