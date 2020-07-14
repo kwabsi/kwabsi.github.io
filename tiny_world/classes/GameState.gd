@@ -83,6 +83,7 @@ func _process(_delta):
 		destroyNode(randi() % len(currentNodes))
 		
 func restart():
+	self.buildingNodeFactory = BuildingNodeFactory.new()
 	self.skillProgress = Progress.new()
 	self.resources = Resources.new(self)
 	for child in currentNodes:

@@ -158,7 +158,15 @@ func _ready():
 func _on_build(id):
 	emit_signal(\"build\", BuildingNodeFactory.TYPE.HOUSING, id)
 
+func _on_hover(id):
+	UIRouter.emit_signal(\"building_hovered\", id, BuildingNodeFactory.TYPE.HOUSING)
+
+func _on_unhover(id):
+	UIRouter.emit_signal(\"building_unhovered\", id, BuildingNodeFactory.TYPE.HOUSING)
+
 func _on_visibility_changed():
+	if !visible:
+		_on_unhover(0)
 	if visible:
 		for child in get_children():
 			child.call_deferred(\"queue_free\")
@@ -167,26 +175,36 @@ func _on_visibility_changed():
 			_button.setText(\"Camp (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.HOUSING, BuildingNodeFactory.HOUSING.CAMP)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.HOUSING.CAMP])
+			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.HOUSING.CAMP])
+			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.HOUSING.CAMP])
 		if GameState.hasSkill(Progress.SKILLS.VILLAGE):
 			var _button = TextButton.instance()
 			_button.setText(\"Village (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.HOUSING, BuildingNodeFactory.HOUSING.VILLAGE)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.HOUSING.VILLAGE])
+			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.HOUSING.VILLAGE])
+			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.HOUSING.VILLAGE])
 		if GameState.hasSkill(Progress.SKILLS.TOWN):
 			var _button = TextButton.instance()
 			_button.setText(\"Village (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.HOUSING, BuildingNodeFactory.HOUSING.TOWN)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.HOUSING.TOWN])
+			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.HOUSING.TOWN])
+			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.HOUSING.TOWN])
 		if GameState.hasSkill(Progress.SKILLS.CITY):
 			var _button = TextButton.instance()
 			_button.setText(\"City (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.HOUSING, BuildingNodeFactory.HOUSING.CITY)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.HOUSING.CITY])
+			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.HOUSING.CITY])
+			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.HOUSING.CITY])
 		if GameState.hasSkill(Progress.SKILLS.METROPOLIS):
 			var _button = TextButton.instance()
 			_button.setText(\"Metropolis (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.HOUSING, BuildingNodeFactory.HOUSING.METROPOLIS)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.HOUSING.METROPOLIS])
+			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.HOUSING.METROPOLIS])
+			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.HOUSING.METROPOLIS])
 	
 "
 
@@ -202,8 +220,16 @@ func _ready():
 
 func _on_build(id):
 	emit_signal(\"build\", BuildingNodeFactory.TYPE.PRODUCTION, id)
+	
+func _on_hover(id):
+	UIRouter.emit_signal(\"building_hovered\", id, BuildingNodeFactory.TYPE.PRODUCTION)
+
+func _on_unhover(id):
+	UIRouter.emit_signal(\"building_unhovered\", id, BuildingNodeFactory.TYPE.PRODUCTION)
 
 func _on_visibility_changed():
+	if !visible:
+		_on_unhover(0)
 	if visible:
 		for child in get_children():
 			child.call_deferred(\"queue_free\")
@@ -212,26 +238,36 @@ func _on_visibility_changed():
 			_button.setText(\"Lumberyard (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.PRODUCTION, BuildingNodeFactory.PRODUCTION.LUMBERYARD)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.PRODUCTION.LUMBERYARD])
+			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.PRODUCTION.LUMBERYARD])
+			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.PRODUCTION.LUMBERYARD])
 		if GameState.hasSkill(Progress.SKILLS.MINE):
 			var _button = TextButton.instance()
 			_button.setText(\"Mine (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.PRODUCTION, BuildingNodeFactory.PRODUCTION.MINE)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.PRODUCTION.MINE])
+			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.PRODUCTION.MINE])
+			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.PRODUCTION.MINE])
 		if GameState.hasSkill(Progress.SKILLS.REFINERY):
 			var _button = TextButton.instance()
 			_button.setText(\"Refinery (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.PRODUCTION, BuildingNodeFactory.PRODUCTION.REFINERY)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.PRODUCTION.REFINERY])
+			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.PRODUCTION.REFINERY])
+			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.PRODUCTION.REFINERY])
 		if GameState.hasSkill(Progress.SKILLS.FACTORY):
 			var _button = TextButton.instance()
 			_button.setText(\"Factory (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.PRODUCTION, BuildingNodeFactory.PRODUCTION.FACTORY)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.PRODUCTION.FACTORY])
+			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.PRODUCTION.FACTORY])
+			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.PRODUCTION.FACTORY])
 		if GameState.hasSkill(Progress.SKILLS.PRODUCTIONPLANT):
 			var _button = TextButton.instance()
 			_button.setText(\"Production Plant (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.PRODUCTION, BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT])
+			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT])
+			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT])
 "
 
 [sub_resource type="GDScript" id=5]
@@ -246,8 +282,16 @@ func _ready():
 
 func _on_build(id):
 	emit_signal(\"build\", BuildingNodeFactory.TYPE.RESEARCH, id)
+	
+func _on_hover(id):
+	UIRouter.emit_signal(\"building_hovered\", id, BuildingNodeFactory.TYPE.RESEARCH)
+
+func _on_unhover(id):
+	UIRouter.emit_signal(\"building_unhovered\", id, BuildingNodeFactory.TYPE.RESEARCH)
 
 func _on_visibility_changed():
+	if !visible:
+		_on_unhover(0)
 	if visible:
 		for child in get_children():
 			child.call_deferred(\"queue_free\")
@@ -256,26 +300,36 @@ func _on_visibility_changed():
 			_button.setText(\"School (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.RESEARCH, BuildingNodeFactory.RESEARCH.SCHOOL)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.RESEARCH.SCHOOL])
+			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.RESEARCH.SCHOOL])
+			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.RESEARCH.SCHOOL])
 		if GameState.hasSkill(Progress.SKILLS.MUSEUM):
 			var _button = TextButton.instance()
 			_button.setText(\"Museum (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.RESEARCH, BuildingNodeFactory.RESEARCH.MUSEUM)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.RESEARCH.MUSEUM])
+			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.RESEARCH.MUSEUM])
+			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.RESEARCH.MUSEUM])
 		if GameState.hasSkill(Progress.SKILLS.LIBRARY):
 			var _button = TextButton.instance()
 			_button.setText(\"Library (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.RESEARCH, BuildingNodeFactory.RESEARCH.LIBRARY)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.RESEARCH.LIBRARY])
+			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.RESEARCH.LIBRARY])
+			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.RESEARCH.LIBRARY])
 		if GameState.hasSkill(Progress.SKILLS.COLLEGE):
 			var _button = TextButton.instance()
 			_button.setText(\"College (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.RESEARCH, BuildingNodeFactory.RESEARCH.COLLEGE)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.RESEARCH.COLLEGE])
+			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.RESEARCH.COLLEGE])
+			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.RESEARCH.COLLEGE])
 		if GameState.hasSkill(Progress.SKILLS.UNIVERSITY):
 			var _button = TextButton.instance()
 			_button.setText(\"University (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.RESEARCH, BuildingNodeFactory.RESEARCH.UNIVERSITY)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.RESEARCH.UNIVERSITY])
+			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.RESEARCH.UNIVERSITY])
+			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.RESEARCH.UNIVERSITY])
 "
 
 [node name="BuildButton" type="TextureButton"]
@@ -344,6 +398,7 @@ margin_left = 4.0
 margin_top = -160.0
 margin_right = 324.0
 margin_bottom = 160.0
+mouse_filter = 1
 
 [node name="HousingOptions" type="VBoxContainer" parent="BuildingActions"]
 visible = false
