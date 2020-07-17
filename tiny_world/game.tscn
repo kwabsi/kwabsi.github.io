@@ -1,4 +1,4 @@
-[gd_scene load_steps=49 format=2]
+[gd_scene load_steps=57 format=2]
 
 [ext_resource path="res://instances/game/World.tscn" type="PackedScene" id=1]
 [ext_resource path="res://instances/ui/Theme.tres" type="Theme" id=2]
@@ -10,6 +10,78 @@
 [ext_resource path="res://assets/graphics/icons/play.png" type="Texture" id=8]
 [ext_resource path="res://assets/fonts/open_sans/OpenSans-Regular.ttf" type="DynamicFontData" id=9]
 [ext_resource path="res://assets/graphics/icons/letter.png" type="Texture" id=10]
+[ext_resource path="res://assets/graphics/icons/play_button.png" type="Texture" id=11]
+[ext_resource path="res://assets/graphics/title.png" type="Texture" id=12]
+[ext_resource path="res://assets/graphics/made_by_me.png" type="Texture" id=13]
+
+[sub_resource type="GDScript" id=41]
+script/source = "extends Node
+
+
+func _ready():
+	GameState.pause()
+	var timer = Timer.new()
+	add_child(timer)
+	timer.connect(\"timeout\", GameState.notifications, \"send\", [Notifications.INDEX.WELCOME])
+	timer.connect(\"timeout\", timer, \"queue_free\")
+	timer.start(2)
+	GameState.connect(\"game_paused_changed\", self, \"_on_unpause\")
+	
+func _on_unpause():
+	if !$World/World.visible:
+		$World/World.visible = true
+"
+
+[sub_resource type="GDScript" id=40]
+script/source = "extends Node2D
+
+const INTERVAL = 0.1
+const SMOOTHNESS = 360
+
+var radius = 32
+var _tick:float = 0.0
+var percentage:float = 0.0
+var secondsLeft:int = 3000
+var worldPolygon:PoolVector2Array = PoolVector2Array()
+
+func updateRadius(_radius):
+	radius = _radius * 0.75
+	updateClock()
+	
+func updateClock():
+	worldPolygon = PoolVector2Array()
+	var _start = int(floor(percentage * (SMOOTHNESS + 1)))
+	worldPolygon.push_back(Vector2.ZERO)
+	for i in range(_start, SMOOTHNESS + 1):
+		var _anglePoint = deg2rad(i * 360 / SMOOTHNESS - 90)
+		worldPolygon.push_back(Vector2(cos(_anglePoint), sin(_anglePoint)) * self.radius)
+	worldPolygon.push_back(Vector2.ZERO)
+	update()
+	
+func _draw():
+	draw_polygon(worldPolygon, PoolColorArray([Color(1, 1, 1, 0.5)]))
+	
+func _physics_process(delta):
+	_tick += delta
+	if _tick >= INTERVAL:
+		_tick -= INTERVAL
+		var _pps = GameState.getPollutionPerSecond()
+		if _pps > 0:
+			percentage = GameState._currentPollution / max(1, GameState.getPollutionCapacity())
+			secondsLeft = int(ceil((GameState.getPollutionCapacity() - GameState._currentPollution) / _pps))
+		else:
+			percentage = 0.0
+			secondsLeft = 300000
+		updateClock()
+
+func _ready():
+	GameState.connect(\"skills_changed\", self, \"_on_skills_changed\")
+	
+func _on_skills_changed():
+	if !visible:
+		if GameState.skillProgress.hasSkill(Progress.SKILLS.DOOMSDAY_CLOCK):
+			visible = true
+"
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Camera2D
@@ -17,18 +89,38 @@ script/source = "extends Camera2D
 export var minZoom:float = 3.0
 export var maxZoom:float = 0.4
 export var zoomSpeed:float = 0.2
+export var shakeIntensity:float = 8.0
+
+var shaking:bool = false
+var oldNodeCount:int = 0
 
 func _init():
 	GameState.camera = self
 
 func _ready():
 	GameState.connect(\"zoom_changed\", self, \"_on_zoom_changed\")
+	GameState.connect(\"currentNodes_changed\", self, \"_on_nodes_changed\")
+	$Timer.connect(\"timeout\", self, \"set\", [\"shaking\", false])
 	_on_zoom_changed()
+	oldNodeCount = len(GameState.currentNodes)
 
 func _on_zoom_changed():
 	$Tween.remove_all()
 	$Tween.interpolate_property(self, \"zoom\", self.zoom, Vector2.ONE * (((1.0 - GameState.zoom) * (minZoom - maxZoom)) + maxZoom), zoomSpeed, Tween.TRANS_SINE)
 	$Tween.start()
+
+func _physics_process(delta):
+	if shaking:
+		self.position = Vector2(640, 360) + Vector2(rand_range(-shakeIntensity, shakeIntensity), rand_range(-shakeIntensity, shakeIntensity))
+	else:
+		self.position = Vector2(640, 360)
+		
+func _on_nodes_changed():
+	if oldNodeCount > len(GameState.currentNodes):
+		oldNodeCount = len(GameState.currentNodes)
+		shaking = true
+		$Timer.start(1.0)
+		
 "
 
 [sub_resource type="StyleBoxFlat" id=2]
@@ -391,12 +483,12 @@ func _on_unhover(__, ___):
 	$Tween.start()
 "
 
-[sub_resource type="StyleBoxFlat" id=37]
+[sub_resource type="StyleBoxFlat" id=27]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_top_left = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="GDScript" id=38]
+[sub_resource type="GDScript" id=28]
 script/source = "extends Panel
 
 var visibleVector = Vector2(1216, 72)
@@ -421,7 +513,7 @@ func _on_pressed():
 	$\"../MessageBox\".visible = true
 "
 
-[sub_resource type="GDScript" id=27]
+[sub_resource type="GDScript" id=29]
 script/source = "extends Control
 
 var cursor:int = -1
@@ -467,15 +559,12 @@ func _on_pause_change():
 	$Tween.start()
 "
 
-[sub_resource type="StyleBoxFlat" id=28]
+[sub_resource type="StyleBoxFlat" id=30]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_top_right = 24
 
-[sub_resource type="StyleBoxFlat" id=29]
-bg_color = Color( 0, 0, 0, 0.607843 )
-
-[sub_resource type="DynamicFont" id=30]
-size = 20
+[sub_resource type="DynamicFont" id=39]
+size = 26
 outline_size = 2
 outline_color = Color( 0, 0, 0, 1 )
 use_filter = true
@@ -483,9 +572,19 @@ font_data = ExtResource( 9 )
 
 [sub_resource type="StyleBoxFlat" id=31]
 bg_color = Color( 0, 0, 0, 0.607843 )
+
+[sub_resource type="DynamicFont" id=32]
+size = 20
+outline_size = 2
+outline_color = Color( 0, 0, 0, 1 )
+use_filter = true
+font_data = ExtResource( 9 )
+
+[sub_resource type="StyleBoxFlat" id=33]
+bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_bottom_right = 24
 
-[sub_resource type="GDScript" id=36]
+[sub_resource type="GDScript" id=34]
 script/source = "extends Control
 
 signal queue_empty()
@@ -539,7 +638,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="GDScript" id=32]
+[sub_resource type="GDScript" id=36]
 script/source = "extends Control
 
 
@@ -554,7 +653,7 @@ func _physics_process(_d):
 				visible = true
 "
 
-[sub_resource type="GDScript" id=33]
+[sub_resource type="GDScript" id=37]
 script/source = "extends Button
 
 
@@ -567,7 +666,7 @@ func _on_pressed():
 	GameState.restart()
 "
 
-[sub_resource type="GDScript" id=34]
+[sub_resource type="GDScript" id=38]
 script/source = "extends Button
 
 
@@ -578,7 +677,61 @@ func _on_pressed():
 	get_tree().quit()
 "
 
+[sub_resource type="GDScript" id=42]
+script/source = "extends Control
+
+
+func _ready():
+	$AnimationPlayer.play(\"enter\")
+	$TextureButton.connect(\"pressed\", self, \"_on_start\")
+	
+func _on_start():
+	GameState.unpause()
+	self.visible = false
+"
+
+[sub_resource type="Animation" id=43]
+resource_name = "enter"
+length = 2.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("TextureRect:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("TextureRect2:rect_position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 1, 2 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 846.494, 724.963 ), Vector2( 846.494, 724.963 ), Vector2( 846.494, 631.963 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("TextureButton:self_modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 0, 0, 0, 0 ), Color( 1, 1, 1, 1 ) ]
+}
+
 [node name="Game" type="Node"]
+script = SubResource( 41 )
 
 [node name="World" type="CanvasLayer" parent="."]
 pause_mode = 1
@@ -592,9 +745,15 @@ __meta__ = {
 }
 
 [node name="World" parent="World" instance=ExtResource( 1 )]
+visible = false
 position = Vector2( 640, 360 )
-spinSpeed = 9
+spinSpeed = 4
 stableColor = Color( 0.105882, 0.47451, 0.0745098, 1 )
+
+[node name="DoomsdayClock" type="Node2D" parent="World"]
+visible = false
+position = Vector2( 640, 360 )
+script = SubResource( 40 )
 
 [node name="Camera2D" type="Camera2D" parent="World"]
 pause_mode = 2
@@ -604,6 +763,8 @@ zoom = Vector2( 0.4, 0.4 )
 script = SubResource( 1 )
 
 [node name="Tween" type="Tween" parent="World/Camera2D"]
+
+[node name="Timer" type="Timer" parent="World/Camera2D"]
 
 [node name="UI" type="CanvasLayer" parent="."]
 pause_mode = 2
@@ -1106,8 +1267,8 @@ anchor_right = 1.0
 anchor_bottom = 0.1
 margin_right = 64.0
 margin_bottom = 64.0
-custom_styles/panel = SubResource( 37 )
-script = SubResource( 38 )
+custom_styles/panel = SubResource( 27 )
+script = SubResource( 28 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1131,9 +1292,10 @@ __meta__ = {
 [node name="Upgrades" type="Control" parent="UI/UI"]
 anchor_top = 0.2
 anchor_bottom = 0.2
-margin_right = 330.0
+margin_left = -330.0
+margin_right = -3.05176e-05
 margin_bottom = 424.0
-script = SubResource( 27 )
+script = SubResource( 29 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1141,7 +1303,7 @@ __meta__ = {
 [node name="TitlePanel" type="Panel" parent="UI/UI/Upgrades"]
 anchor_right = 1.0
 margin_bottom = 99.0
-custom_styles/panel = SubResource( 28 )
+custom_styles/panel = SubResource( 30 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1151,6 +1313,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 64.0
 margin_right = -64.0
+custom_fonts/font = SubResource( 39 )
 text = "Upgrade Name"
 align = 1
 autowrap = true
@@ -1203,7 +1366,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = 101.0
 margin_bottom = -50.0
-custom_styles/panel = SubResource( 29 )
+custom_styles/panel = SubResource( 31 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1213,7 +1376,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 8.0
 margin_right = -8.0
-custom_fonts/font = SubResource( 30 )
+custom_fonts/font = SubResource( 32 )
 text = "This contains a lot of text, that shows you what this upgrade does and stuff.
 "
 autowrap = true
@@ -1228,7 +1391,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = -48.0
 margin_bottom = 2.0
-custom_styles/panel = SubResource( 31 )
+custom_styles/panel = SubResource( 33 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1272,7 +1435,7 @@ __meta__ = {
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = SubResource( 36 )
+script = SubResource( 34 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1356,7 +1519,7 @@ visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme = ExtResource( 2 )
-script = SubResource( 32 )
+script = SubResource( 36 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1383,7 +1546,7 @@ margin_bottom = 20.0
 focus_mode = 0
 enabled_focus_mode = 0
 text = "Restart"
-script = SubResource( 33 )
+script = SubResource( 37 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1399,4 +1562,71 @@ margin_bottom = 20.0
 focus_mode = 0
 enabled_focus_mode = 0
 text = "Quit"
-script = SubResource( 34 )
+script = SubResource( 38 )
+
+[node name="StartScreen" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="Control" type="Control" parent="StartScreen"]
+pause_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = SubResource( 42 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="StartScreen/Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = 40.0
+margin_bottom = 40.0
+color = Color( 0, 0, 0, 0.607843 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureButton" type="TextureButton" parent="StartScreen/Control"]
+self_modulate = Color( 0, 0, 0, 0 )
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -62.7722
+margin_top = -64.0
+margin_right = 65.2278
+margin_bottom = 64.0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource( 11 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="StartScreen/Control"]
+self_modulate = Color( 1, 1, 1, 0 )
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -640.0
+margin_top = 64.7076
+margin_right = 640.0
+margin_bottom = 320.708
+texture = ExtResource( 12 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect2" type="TextureRect" parent="StartScreen/Control"]
+margin_left = 846.494
+margin_top = 724.963
+margin_right = 1404.49
+margin_bottom = 831.963
+rect_scale = Vector2( 0.8, 0.8 )
+texture = ExtResource( 13 )
+expand = true
+stretch_mode = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="StartScreen/Control"]
+anims/enter = SubResource( 43 )

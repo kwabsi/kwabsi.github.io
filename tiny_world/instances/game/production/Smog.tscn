@@ -1,0 +1,62 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://assets/graphics/icons/particle.png" type="Texture" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "tool
+extends Node2D
+
+export var particles:int = 32 setget setParticles
+
+func setParticles(p):
+	if get_node_or_null(\"Particles2D\") != null && is_instance_valid($Particles2D):
+		$Particles2D.amount = p
+	particles = p
+	
+func _ready():
+	setParticles(particles)
+"
+
+[sub_resource type="Gradient" id=2]
+offsets = PoolRealArray( 0, 0.496296, 1 )
+colors = PoolColorArray( 0.501961, 0.501961, 0.501961, 0.313726, 0.709804, 0.709804, 0.709804, 0.607843, 0.819608, 0.819608, 0.819608, 0.313726 )
+
+[sub_resource type="GradientTexture" id=3]
+gradient = SubResource( 2 )
+
+[sub_resource type="Curve" id=4]
+_data = [ Vector2( 0, 0.331818 ), 0.0, 1.07727, 0, 0, Vector2( 1, 0.696591 ), 0.0700666, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=5]
+curve = SubResource( 4 )
+
+[sub_resource type="ParticlesMaterial" id=6]
+emission_shape = 2
+emission_box_extents = Vector3( 64, 8, 1 )
+flag_disable_z = true
+direction = Vector3( 0, -1, 0 )
+gravity = Vector3( 0, 0, 0 )
+initial_velocity = 32.0
+initial_velocity_random = 0.4
+angular_velocity = -50.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+linear_accel = -10.0
+scale = 0.2
+scale_random = 0.3
+scale_curve = SubResource( 5 )
+color_ramp = SubResource( 3 )
+
+[node name="Node2D" type="Node2D"]
+self_modulate = Color( 1, 1, 1, 0.313726 )
+position = Vector2( -0.21463, 0 )
+script = SubResource( 1 )
+particles = 256
+
+[node name="Particles2D" type="Particles2D" parent="."]
+amount = 256
+lifetime = 3.0
+local_coords = false
+draw_order = 1
+process_material = SubResource( 6 )
+texture = ExtResource( 1 )

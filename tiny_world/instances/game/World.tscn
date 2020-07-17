@@ -21,7 +21,13 @@ func setRadius(_radius):
 func recalculatePolygons():
 	worldPolygon = PoolVector2Array()
 	for building in GameState.currentNodes:
-		building.updateRadius(self.radius)
+		if is_instance_valid(building):
+			building.updateRadius(self.radius)
+	$\"../DoomsdayClock\".updateRadius(self.radius)
+	for i in range(planetSmoothness + 1):
+		var _anglePoint = deg2rad(i * 360 / self.planetSmoothness - 90)
+		worldPolygon.push_back(Vector2(cos(_anglePoint), sin(_anglePoint)) * self.radius)
+	update()
 
 func _process(delta):
 	self.rotation_degrees = fmod((self.rotation_degrees + (spinSpeed * delta)), 360.0)
@@ -32,11 +38,7 @@ func _ready():
 	_on_game_currentNodes_changed()
 
 func _draw():
-	var _points = PoolVector2Array()
-	for i in range(planetSmoothness + 1):
-		var _anglePoint = deg2rad(i * 360 / self.planetSmoothness - 90)
-		_points.push_back(Vector2(cos(_anglePoint), sin(_anglePoint)) * self.radius)
-	draw_polygon(_points, PoolColorArray([stableColor]))
+	draw_polygon(worldPolygon, PoolColorArray([stableColor]))
 
 func _on_game_currentNodes_changed():
 	for child in $Nodes.get_children():

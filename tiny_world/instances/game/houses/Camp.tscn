@@ -4,6 +4,12 @@
 
 [node name="Node2D" type="Node2D"]
 
+[node name="Sprite2" type="Sprite" parent="."]
+self_modulate = Color( 0, 0, 0, 0.313726 )
+position = Vector2( 4, -4 )
+texture = ExtResource( 1 )
+offset = Vector2( 0, -56 )
+
 [node name="Sprite" type="Sprite" parent="."]
 texture = ExtResource( 1 )
 offset = Vector2( 0, -56 )

@@ -186,7 +186,7 @@ func _on_visibility_changed():
 			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.HOUSING.VILLAGE])
 		if GameState.hasSkill(Progress.SKILLS.TOWN):
 			var _button = TextButton.instance()
-			_button.setText(\"Village (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.HOUSING, BuildingNodeFactory.HOUSING.TOWN)) + \")\")
+			_button.setText(\"Town (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.HOUSING, BuildingNodeFactory.HOUSING.TOWN)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.HOUSING.TOWN])
 			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.HOUSING.TOWN])
@@ -263,7 +263,7 @@ func _on_visibility_changed():
 			_button.connect(\"mouse_exited\", self, \"_on_unhover\", [BuildingNodeFactory.PRODUCTION.FACTORY])
 		if GameState.hasSkill(Progress.SKILLS.PRODUCTIONPLANT):
 			var _button = TextButton.instance()
-			_button.setText(\"Production Plant (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.PRODUCTION, BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT)) + \")\")
+			_button.setText(\"Prod. Plant (Cost: \" + str(GameState.getBuildingCost(BuildingNodeFactory.TYPE.PRODUCTION, BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT)) + \")\")
 			add_child(_button)
 			_button.connect(\"pressed\", self, \"_on_build\", [BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT])
 			_button.connect(\"mouse_entered\", self, \"_on_hover\", [BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT])

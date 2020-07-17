@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://assets/graphics/material/mine.png" type="Texture" id=1]
+[ext_resource path="res://instances/game/production/Smoke.tscn" type="PackedScene" id=2]
+
+[node name="LumberYard" type="Node2D"]
+
+[node name="Sprite2" type="Sprite" parent="."]
+self_modulate = Color( 0, 0, 0, 0.313726 )
+position = Vector2( 4, -4.51337 )
+texture = ExtResource( 1 )
+offset = Vector2( 0, -48 )
+
+[node name="Node2D" parent="." instance=ExtResource( 2 )]
+position = Vector2( 30.8006, -56.9812 )
+particles = 16
+
+[node name="Node2D2" parent="." instance=ExtResource( 2 )]
+position = Vector2( 48.2543, -56.9812 )
+particles = 16
+
+[node name="Sprite" type="Sprite" parent="."]
+texture = ExtResource( 1 )
+offset = Vector2( 0, -48 )
