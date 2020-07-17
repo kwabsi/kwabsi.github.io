@@ -14,7 +14,7 @@
 [ext_resource path="res://assets/graphics/title.png" type="Texture" id=12]
 [ext_resource path="res://assets/graphics/made_by_me.png" type="Texture" id=13]
 
-[sub_resource type="GDScript" id=41]
+[sub_resource type="GDScript" id=1]
 script/source = "extends Node
 
 
@@ -32,7 +32,7 @@ func _on_unpause():
 		$World/World.visible = true
 "
 
-[sub_resource type="GDScript" id=40]
+[sub_resource type="GDScript" id=2]
 script/source = "extends Node2D
 
 const INTERVAL = 0.1
@@ -83,7 +83,7 @@ func _on_skills_changed():
 			visible = true
 "
 
-[sub_resource type="GDScript" id=1]
+[sub_resource type="GDScript" id=3]
 script/source = "extends Camera2D
 
 export var minZoom:float = 3.0
@@ -123,10 +123,10 @@ func _on_nodes_changed():
 		
 "
 
-[sub_resource type="StyleBoxFlat" id=2]
+[sub_resource type="StyleBoxFlat" id=4]
 bg_color = Color( 0, 0, 0, 0.607843 )
 
-[sub_resource type="GDScript" id=3]
+[sub_resource type="GDScript" id=5]
 script/source = "extends Panel
 
 const INTERVAL = 0.5
@@ -142,7 +142,7 @@ func _process(delta):
 		updateText()
 "
 
-[sub_resource type="GDScript" id=4]
+[sub_resource type="GDScript" id=6]
 script/source = "extends Panel
 
 
@@ -153,11 +153,11 @@ func _on_change(__):
 	GameState.populationWeight = $HSlider.value
 "
 
-[sub_resource type="StyleBoxFlat" id=5]
+[sub_resource type="StyleBoxFlat" id=7]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_bottom_left = 24
 
-[sub_resource type="GDScript" id=6]
+[sub_resource type="GDScript" id=8]
 script/source = "extends Panel
 
 const INTERVAL = 0.5
@@ -173,11 +173,11 @@ func _process(delta):
 		updateText()
 "
 
-[sub_resource type="StyleBoxFlat" id=7]
+[sub_resource type="StyleBoxFlat" id=9]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_bottom_left = 24
 
-[sub_resource type="GDScript" id=8]
+[sub_resource type="GDScript" id=10]
 script/source = "extends Panel
 
 const INTERVAL = 0.5
@@ -197,11 +197,11 @@ func _process(delta):
 		updateText()
 "
 
-[sub_resource type="StyleBoxFlat" id=9]
+[sub_resource type="StyleBoxFlat" id=11]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_bottom_right = 24
 
-[sub_resource type="GDScript" id=10]
+[sub_resource type="GDScript" id=12]
 script/source = "extends Panel
 
 const INTERVAL = 0.5
@@ -217,11 +217,11 @@ func _process(delta):
 		updateText()
 "
 
-[sub_resource type="StyleBoxFlat" id=11]
+[sub_resource type="StyleBoxFlat" id=13]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_bottom_right = 24
 
-[sub_resource type="GDScript" id=12]
+[sub_resource type="GDScript" id=14]
 script/source = "extends Panel
 
 const INTERVAL = 0.5
@@ -241,12 +241,12 @@ func _process(delta):
 		updateText()
 "
 
-[sub_resource type="StyleBoxFlat" id=13]
+[sub_resource type="StyleBoxFlat" id=15]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="GDScript" id=14]
+[sub_resource type="GDScript" id=16]
 script/source = "extends Panel
 
 const INTERVAL = 0.25
@@ -264,7 +264,7 @@ func _process(delta):
 		updateText()
 "
 
-[sub_resource type="GDScript" id=15]
+[sub_resource type="GDScript" id=17]
 script/source = "extends Panel
 
 const INTERVAL = 0.25
@@ -282,7 +282,7 @@ func _process(delta):
 		updateText()
 "
 
-[sub_resource type="GDScript" id=16]
+[sub_resource type="GDScript" id=18]
 script/source = "extends Control
 
 var BuildButton = preload(\"res://instances/ui/BuildButton.tscn\")
@@ -300,12 +300,12 @@ func _on_game_currentNodes_changed():
 		add_child(button)
 "
 
-[sub_resource type="StyleBoxFlat" id=17]
+[sub_resource type="StyleBoxFlat" id=19]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_top_left = 24
 corner_radius_top_right = 24
 
-[sub_resource type="GDScript" id=18]
+[sub_resource type="GDScript" id=20]
 script/source = "extends Button
 
 func _ready():
@@ -315,7 +315,7 @@ func _on_pressed():
 	GameState.setZoom(GameState.zoom - $\"../ZoomSlider\".step)
 "
 
-[sub_resource type="GDScript" id=19]
+[sub_resource type="GDScript" id=21]
 script/source = "extends Button
 
 func _ready():
@@ -325,7 +325,7 @@ func _on_pressed():
 	GameState.setZoom(GameState.zoom + $\"../ZoomSlider\".step)
 "
 
-[sub_resource type="GDScript" id=20]
+[sub_resource type="GDScript" id=22]
 script/source = "extends HSlider
 
 
@@ -341,11 +341,11 @@ func _on_zoom_changed():
 	self.value = GameState.zoom
 "
 
-[sub_resource type="StyleBoxFlat" id=21]
+[sub_resource type="StyleBoxFlat" id=23]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_bottom_left = 24
 
-[sub_resource type="GDScript" id=22]
+[sub_resource type="GDScript" id=24]
 script/source = "extends TextureButton
 
 
@@ -365,7 +365,7 @@ func _on_game_speed_change(_newSpeed):
 		self.self_modulate = Color(1, 1, 1, 0.5)
 "
 
-[sub_resource type="GDScript" id=23]
+[sub_resource type="GDScript" id=25]
 script/source = "extends TextureButton
 
 
@@ -385,7 +385,7 @@ func _on_game_speed_change(_newSpeed):
 		self.self_modulate = Color(1, 1, 1, 0.5)
 "
 
-[sub_resource type="GDScript" id=24]
+[sub_resource type="GDScript" id=26]
 script/source = "extends TextureButton
 
 
@@ -405,12 +405,12 @@ func _on_game_speed_change(_newSpeed):
 		self.self_modulate = Color(1, 1, 1, 0.5)
 "
 
-[sub_resource type="StyleBoxFlat" id=25]
+[sub_resource type="StyleBoxFlat" id=27]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 
-[sub_resource type="GDScript" id=26]
+[sub_resource type="GDScript" id=28]
 script/source = "extends Panel
 
 var popIcon = preload(\"res://assets/graphics/icons/population.png\")
@@ -483,12 +483,12 @@ func _on_unhover(__, ___):
 	$Tween.start()
 "
 
-[sub_resource type="StyleBoxFlat" id=27]
+[sub_resource type="StyleBoxFlat" id=29]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_top_left = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="GDScript" id=28]
+[sub_resource type="GDScript" id=30]
 script/source = "extends Panel
 
 var visibleVector = Vector2(1216, 72)
@@ -513,7 +513,7 @@ func _on_pressed():
 	$\"../MessageBox\".visible = true
 "
 
-[sub_resource type="GDScript" id=29]
+[sub_resource type="GDScript" id=31]
 script/source = "extends Control
 
 var cursor:int = -1
@@ -559,32 +559,32 @@ func _on_pause_change():
 	$Tween.start()
 "
 
-[sub_resource type="StyleBoxFlat" id=30]
+[sub_resource type="StyleBoxFlat" id=32]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_top_right = 24
 
-[sub_resource type="DynamicFont" id=39]
+[sub_resource type="DynamicFont" id=33]
 size = 26
 outline_size = 2
 outline_color = Color( 0, 0, 0, 1 )
 use_filter = true
 font_data = ExtResource( 9 )
 
-[sub_resource type="StyleBoxFlat" id=31]
+[sub_resource type="StyleBoxFlat" id=34]
 bg_color = Color( 0, 0, 0, 0.607843 )
 
-[sub_resource type="DynamicFont" id=32]
+[sub_resource type="DynamicFont" id=35]
 size = 20
 outline_size = 2
 outline_color = Color( 0, 0, 0, 1 )
 use_filter = true
 font_data = ExtResource( 9 )
 
-[sub_resource type="StyleBoxFlat" id=33]
+[sub_resource type="StyleBoxFlat" id=36]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_bottom_right = 24
 
-[sub_resource type="GDScript" id=34]
+[sub_resource type="GDScript" id=37]
 script/source = "extends Control
 
 signal queue_empty()
@@ -625,7 +625,7 @@ func _on_close():
 	GameState.unpause()
 "
 
-[sub_resource type="StyleBoxFlat" id=35]
+[sub_resource type="StyleBoxFlat" id=38]
 bg_color = Color( 0, 0, 0, 1 )
 border_width_left = 4
 border_width_top = 4
@@ -638,7 +638,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="GDScript" id=36]
+[sub_resource type="GDScript" id=39]
 script/source = "extends Control
 
 
@@ -653,7 +653,7 @@ func _physics_process(_d):
 				visible = true
 "
 
-[sub_resource type="GDScript" id=37]
+[sub_resource type="GDScript" id=40]
 script/source = "extends Button
 
 
@@ -666,7 +666,7 @@ func _on_pressed():
 	GameState.restart()
 "
 
-[sub_resource type="GDScript" id=38]
+[sub_resource type="GDScript" id=41]
 script/source = "extends Button
 
 
@@ -731,7 +731,7 @@ tracks/2/keys = {
 }
 
 [node name="Game" type="Node"]
-script = SubResource( 41 )
+script = SubResource( 1 )
 
 [node name="World" type="CanvasLayer" parent="."]
 pause_mode = 1
@@ -753,14 +753,14 @@ stableColor = Color( 0.105882, 0.47451, 0.0745098, 1 )
 [node name="DoomsdayClock" type="Node2D" parent="World"]
 visible = false
 position = Vector2( 640, 360 )
-script = SubResource( 40 )
+script = SubResource( 2 )
 
 [node name="Camera2D" type="Camera2D" parent="World"]
 pause_mode = 2
 position = Vector2( 640, 360 )
 current = true
 zoom = Vector2( 0.4, 0.4 )
-script = SubResource( 1 )
+script = SubResource( 3 )
 
 [node name="Tween" type="Tween" parent="World/Camera2D"]
 
@@ -796,8 +796,8 @@ __meta__ = {
 margin_left = 192.0
 margin_right = 384.0
 margin_bottom = 48.0
-custom_styles/panel = SubResource( 2 )
-script = SubResource( 3 )
+custom_styles/panel = SubResource( 4 )
+script = SubResource( 5 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -835,8 +835,8 @@ margin_left = 192.0
 margin_top = 48.0
 margin_right = 384.0
 margin_bottom = 96.0
-custom_styles/panel = SubResource( 2 )
-script = SubResource( 4 )
+custom_styles/panel = SubResource( 4 )
+script = SubResource( 6 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -856,8 +856,8 @@ __meta__ = {
 [node name="MaterialsPanel" type="Panel" parent="UI/UI/Numbers"]
 margin_right = 192.0
 margin_bottom = 48.0
-custom_styles/panel = SubResource( 5 )
-script = SubResource( 6 )
+custom_styles/panel = SubResource( 7 )
+script = SubResource( 8 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -895,8 +895,8 @@ margin_left = 32.0
 margin_top = 48.0
 margin_right = 192.0
 margin_bottom = 96.0
-custom_styles/panel = SubResource( 7 )
-script = SubResource( 8 )
+custom_styles/panel = SubResource( 9 )
+script = SubResource( 10 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -920,8 +920,8 @@ __meta__ = {
 margin_left = 384.0
 margin_right = 576.0
 margin_bottom = 48.0
-custom_styles/panel = SubResource( 9 )
-script = SubResource( 10 )
+custom_styles/panel = SubResource( 11 )
+script = SubResource( 12 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -959,8 +959,8 @@ margin_left = 384.0
 margin_top = 48.0
 margin_right = 544.0
 margin_bottom = 96.0
-custom_styles/panel = SubResource( 11 )
-script = SubResource( 12 )
+custom_styles/panel = SubResource( 13 )
+script = SubResource( 14 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -985,8 +985,8 @@ margin_left = 384.0
 margin_top = 96.0
 margin_right = 512.0
 margin_bottom = 120.0
-custom_styles/panel = SubResource( 13 )
-script = SubResource( 14 )
+custom_styles/panel = SubResource( 15 )
+script = SubResource( 16 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1015,8 +1015,8 @@ margin_left = 64.0
 margin_top = 96.0
 margin_right = 192.0
 margin_bottom = 120.0
-custom_styles/panel = SubResource( 13 )
-script = SubResource( 15 )
+custom_styles/panel = SubResource( 15 )
+script = SubResource( 17 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1041,7 +1041,7 @@ __meta__ = {
 [node name="Tween" type="Tween" parent="UI/UI/Numbers/MaterialEffectivity"]
 
 [node name="BuildingButtons" type="Control" parent="UI/UI"]
-script = SubResource( 16 )
+script = SubResource( 18 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1054,7 +1054,7 @@ anchor_bottom = 1.0
 margin_left = -192.0
 margin_top = -48.0
 margin_right = 192.0
-custom_styles/panel = SubResource( 17 )
+custom_styles/panel = SubResource( 19 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1067,7 +1067,7 @@ focus_mode = 0
 enabled_focus_mode = 0
 text = "-"
 flat = true
-script = SubResource( 18 )
+script = SubResource( 20 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1082,7 +1082,7 @@ focus_mode = 0
 enabled_focus_mode = 0
 text = "+"
 flat = true
-script = SubResource( 19 )
+script = SubResource( 21 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1096,7 +1096,7 @@ max_value = 1.0
 step = 0.05
 tick_count = 11
 ticks_on_borders = true
-script = SubResource( 20 )
+script = SubResource( 22 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1113,7 +1113,7 @@ anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -176.0
 margin_bottom = 48.0
-custom_styles/panel = SubResource( 21 )
+custom_styles/panel = SubResource( 23 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1130,7 +1130,7 @@ mouse_default_cursor_shape = 2
 enabled_focus_mode = 0
 texture_normal = ExtResource( 6 )
 expand = true
-script = SubResource( 22 )
+script = SubResource( 24 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1147,7 +1147,7 @@ mouse_default_cursor_shape = 2
 enabled_focus_mode = 0
 texture_normal = ExtResource( 7 )
 expand = true
-script = SubResource( 23 )
+script = SubResource( 25 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1164,7 +1164,7 @@ mouse_default_cursor_shape = 2
 enabled_focus_mode = 0
 texture_normal = ExtResource( 8 )
 expand = true
-script = SubResource( 24 )
+script = SubResource( 26 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1175,8 +1175,8 @@ anchor_right = 0.25
 anchor_bottom = 0.8
 margin_left = -320.0
 margin_right = -320.0
-custom_styles/panel = SubResource( 25 )
-script = SubResource( 26 )
+custom_styles/panel = SubResource( 27 )
+script = SubResource( 28 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1267,8 +1267,8 @@ anchor_right = 1.0
 anchor_bottom = 0.1
 margin_right = 64.0
 margin_bottom = 64.0
-custom_styles/panel = SubResource( 27 )
-script = SubResource( 28 )
+custom_styles/panel = SubResource( 29 )
+script = SubResource( 30 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1295,7 +1295,7 @@ anchor_bottom = 0.2
 margin_left = -330.0
 margin_right = -3.05176e-05
 margin_bottom = 424.0
-script = SubResource( 29 )
+script = SubResource( 31 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1303,7 +1303,7 @@ __meta__ = {
 [node name="TitlePanel" type="Panel" parent="UI/UI/Upgrades"]
 anchor_right = 1.0
 margin_bottom = 99.0
-custom_styles/panel = SubResource( 30 )
+custom_styles/panel = SubResource( 32 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1313,7 +1313,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 64.0
 margin_right = -64.0
-custom_fonts/font = SubResource( 39 )
+custom_fonts/font = SubResource( 33 )
 text = "Upgrade Name"
 align = 1
 autowrap = true
@@ -1366,7 +1366,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = 101.0
 margin_bottom = -50.0
-custom_styles/panel = SubResource( 31 )
+custom_styles/panel = SubResource( 34 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1376,7 +1376,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 8.0
 margin_right = -8.0
-custom_fonts/font = SubResource( 32 )
+custom_fonts/font = SubResource( 35 )
 text = "This contains a lot of text, that shows you what this upgrade does and stuff.
 "
 autowrap = true
@@ -1391,7 +1391,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = -48.0
 margin_bottom = 2.0
-custom_styles/panel = SubResource( 33 )
+custom_styles/panel = SubResource( 36 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1435,7 +1435,7 @@ __meta__ = {
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = SubResource( 34 )
+script = SubResource( 37 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1450,7 +1450,7 @@ anchor_left = 0.2
 anchor_top = 0.1
 anchor_right = 0.8
 anchor_bottom = 0.8
-custom_styles/panel = SubResource( 35 )
+custom_styles/panel = SubResource( 38 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1519,7 +1519,7 @@ visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme = ExtResource( 2 )
-script = SubResource( 36 )
+script = SubResource( 39 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1546,7 +1546,7 @@ margin_bottom = 20.0
 focus_mode = 0
 enabled_focus_mode = 0
 text = "Restart"
-script = SubResource( 37 )
+script = SubResource( 40 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1562,7 +1562,7 @@ margin_bottom = 20.0
 focus_mode = 0
 enabled_focus_mode = 0
 text = "Quit"
-script = SubResource( 38 )
+script = SubResource( 41 )
 
 [node name="StartScreen" type="CanvasLayer" parent="."]
 layer = 5
