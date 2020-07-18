@@ -139,12 +139,6 @@ func triggerDestruction():
 		if skillProgress.hasSkill(Progress.SKILLS.ATOMIC_ENERGY) && _node.type == BuildingNodeFactory.TYPE.HOUSING:
 			triggerDestruction()
 			triggerDestruction()
-
-func _process(_delta):
-	if Input.is_action_just_pressed("ui_up"):
-		restart()
-	if Input.is_action_just_pressed("ui_down"):
-		destroyNode(randi() % len(currentNodes))
 		
 func _physics_process(delta):
 	if len(currentNodes) > 0:
