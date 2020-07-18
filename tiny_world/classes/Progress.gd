@@ -70,7 +70,7 @@ func _init_skillDict():
 		SKILLS.CLEAN_ENERGY: Skill.new("Clean Energy", "Develop and deploy clean ways to generate electricity. Decrease Pollution by 10%.", 40, [SKILLS.ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_clean_energy")),
 		SKILLS.WASTE_MANAGEMENT: Skill.new("Waste Management", "Research ways to safely and cleanly dispose of waste. Decrease Pollution by 10%.", 80, [SKILLS.ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_waste_management")),
 		SKILLS.GREEN_LAWS: Skill.new("Green Laws", "Enforce Laws that protect the environment. Decrease Pollution by 20%, but also decrease overall material production by 10%.", 120, [SKILLS.ENVIRONMENTAL_RESEARCH, SKILLS.FLG_CLEAN, SKILLS.CITY], funcref(self, "_skill_green_laws")),
-		SKILLS.FACTORY_ACCOUNTABILITY: Skill.new("Factory Accountability", "Force factory owners to optimize production chains by creating additional laws. Decrease Pollution by 40%, but also decrease overall material production by 50%.", 1000, [SKILLS.ADVANCED_ENVIRONMENTAL_RESEARCH, SKILLS.FACTORY], funcref(self, "_skill_factory_accountability")),
+		SKILLS.FACTORY_ACCOUNTABILITY: Skill.new("Factory Accountability", "Force factory owners to optimize production chains for pollution prevention by creating additional laws. Decrease Pollution by 40%, but also decrease overall material production by 50%.", 1000, [SKILLS.GREEN_LAWS, SKILLS.ADVANCED_ENVIRONMENTAL_RESEARCH, SKILLS.FACTORY], funcref(self, "_skill_factory_accountability")),
 	
 		SKILLS.REFORESTATION: Skill.new("Reforestation", "Replant trees and reinvigorate nature. Increases Pollution Capacity by 20%.", 200, [SKILLS.ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_reforestation")),
 		SKILLS.NATURE_RESERVES: Skill.new("Nature Reserves", "Declare parts of the planet as nature reserves. Increases Pollution Capacity by 50%, but immediately let the planet shrink once.", 300, [SKILLS.ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_nature_reserves")),
@@ -79,7 +79,7 @@ func _init_skillDict():
 		SKILLS.CLEANER_ENERGY: Skill.new("Cleaner Energy", "Bring theorethical machineries beyond scientists wildest dreams to life. Decrease pollution by 20%.", 1000, [SKILLS.ADVANCED_ENVIRONMENTAL_RESEARCH, SKILLS.CLEAN_ENERGY], funcref(self, "_skill_cleaner_energy")),
 		SKILLS.GREEN_ZEITGEIST: Skill.new("Green Zeitgeist", "Increase awareness in the people about environment and nurture a society, which wants to preserve nature. Decrease pollution by 20%.", 1000, [SKILLS.ADVANCED_ENVIRONMENTAL_RESEARCH, SKILLS.CITY], funcref(self, "_skill_green_zeitgeist")),
 
-		SKILLS.BRIGHT_FUTURE: Skill.new("Bright Future", "End climate change.", 5000, [SKILLS.GREEN_ZEITGEIST, SKILLS.CLEANER_ENERGY, SKILLS.FACTORY_ACCOUNTABILITY, SKILLS.TERRAFORMING, SKILLS.FACILITIES], funcref(self, "_skill_bright_future")),
+		SKILLS.BRIGHT_FUTURE: Skill.new("Bright Future", "End climate change.", 5000, [SKILLS.FLG_CLEAN, SKILLS.GREEN_ZEITGEIST, SKILLS.CLEANER_ENERGY, SKILLS.FACTORY_ACCOUNTABILITY, SKILLS.TERRAFORMING, SKILLS.FACILITIES], funcref(self, "_skill_bright_future")),
 		SKILLS.FLG_ENVIRONMENT: Skill.new("EnvFlag", "You shouldn't see this.", 0, [-1]),
 		SKILLS.FLG_CLEAN: Skill.new("CleanFlag", "You shouldn't see this.", 0, [-1]),
 		SKILLS.FLG_CORRUPTABLE: Skill.new("CorruptFlag", "You shouldn't see this.", 0, [-1]),
@@ -127,6 +127,7 @@ func _skill_public_transport():
 	
 func _skill_right_violation():
 	parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.MINE].housingCapacity = floor(0.75 * parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.MINE].housingCapacity)
+	skillDict[SKILLS.FLG_CLEAN].learned = false
 
 func _skill_fracking():
 	parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.REFINERY].footPrint = ceil(1.2 * parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.REFINERY].footPrint)
@@ -146,6 +147,7 @@ func _skill_child_labour():
 	parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT].materialsPerSecond = floor(1.2 * parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT].materialsPerSecond)
 	parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT].housingCapacity = ceil(0.8 * parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT].housingCapacity)
 	skillDict[SKILLS.FLG_CLEAN].learned = false
+	parent.notifications.send(Notifications.INDEX.CHILD_LABOUR)
 
 func _skill_activities():
 	parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.RESEARCH][BuildingNodeFactory.RESEARCH.SCHOOL].researchPerSecond = ceil(1.4 * parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.RESEARCH][BuildingNodeFactory.RESEARCH.SCHOOL].researchPerSecond)

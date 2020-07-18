@@ -2,7 +2,7 @@ extends Node
 class_name Notifications
 
 enum INDEX {
-	WELCOME, QUAKE_TUTORIAL, CHAIN_REACTION, TAUNT, GAME_OVER, WIN
+	WELCOME, QUAKE_TUTORIAL, CHAIN_REACTION, TAUNT, GAME_OVER, WIN, CHILD_LABOUR
 }
 
 var notifDict = {
@@ -11,7 +11,8 @@ var notifDict = {
 	INDEX.CHAIN_REACTION: Notification.new("Maybe the urgentness of the situation in our last message wasn't clear enough. The reduction of your personal planet is cause for concern.\nFurther loss of inhabitable land could lead to chain reactions in multiple environmental factors, which may progress faster than you can manage.\n\nWe advice to invest more into sustainable options."),
 	INDEX.TAUNT: Notification.new("To circle back to our last statement: Planet shrink bad. Resolve this issue at once or your world will be nothing more than a spec of dust."),
 	INDEX.GAME_OVER: Notification.new("Dear lady, gentleman or distinguished person outside of the binary,\n\nWe regret to inform you, that you now see the last breaths of a once prosperous and promising new planet. The destruction of this world under your responsibility is imminent and unstoppable.\n\nWe want to remind you, that this is all your fault.\n\nBest regards"),
-	INDEX.WIN: Notification.new("Congratulations.\nYou successfully created a society where the smartest of the smarties could develop a solution to the greatest threat of your world. Consider your journey a complete success. Feel free to continue building your own world, but as far as we are concerned, you won.")
+	INDEX.WIN: Notification.new("Congratulations.\nYou successfully created a society where the smartest of the smarties could develop a solution to the greatest threat of your world. Consider your journey a complete success. Feel free to continue building your own world, but as far as we are concerned, you won."),
+	INDEX.CHILD_LABOUR: Notification.new("You disgust us. You digust me, the person writing this.\nYou can not create a healthy world by violating human rights.\nJust to be clear: You lost. You can continue, but you can not win. Please, don't try again."),
 }
 
 var parent

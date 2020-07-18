@@ -1,4 +1,4 @@
-[gd_scene load_steps=59 format=2]
+[gd_scene load_steps=63 format=2]
 
 [ext_resource path="res://instances/game/World.tscn" type="PackedScene" id=1]
 [ext_resource path="res://instances/ui/Theme.tres" type="Theme" id=2]
@@ -13,6 +13,7 @@
 [ext_resource path="res://assets/graphics/icons/play_button.png" type="Texture" id=11]
 [ext_resource path="res://assets/graphics/title.png" type="Texture" id=12]
 [ext_resource path="res://assets/graphics/made_by_me.png" type="Texture" id=13]
+[ext_resource path="res://assets/graphics/icons/sound.png" type="Texture" id=14]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node
@@ -805,7 +806,7 @@ tracks/1/keys = {
 "times": PoolRealArray( 0, 1, 2 ),
 "transitions": PoolRealArray( 1, 1, 1 ),
 "update": 0,
-"values": [ Vector2( 846.494, 724.963 ), Vector2( 846.494, 724.963 ), Vector2( 846.494, 631.963 ) ]
+"values": [ Vector2( -1.44501, 721.464 ), Vector2( -1.44501, 721.464 ), Vector2( -1.445, 631.963 ) ]
 }
 tracks/2/type = "value"
 tracks/2/path = NodePath("TextureButton:self_modulate")
@@ -819,6 +820,38 @@ tracks/2/keys = {
 "update": 0,
 "values": [ Color( 0, 0, 0, 0 ), Color( 1, 1, 1, 1 ) ]
 }
+
+[sub_resource type="StyleBoxFlat" id=46]
+bg_color = Color( 0, 0, 0, 0.607843 )
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+
+[sub_resource type="GDScript" id=49]
+script/source = "extends Panel
+
+func _ready():
+	self.connect(\"mouse_entered\", self, \"setActive\", [true])
+	self.connect(\"mouse_exited\", self, \"setActive\", [false])
+	
+func setActive(active):
+	var _trueActive = active || (get_global_mouse_position().x > 1218 && get_global_mouse_position().y > 652)
+	$Tween.remove_all()
+	if _trueActive:
+		$Tween.interpolate_property(self, \"rect_position\", self.rect_position, Vector2(1216, 400), 0.5, Tween.TRANS_SINE)
+	else:
+		$Tween.interpolate_property(self, \"rect_position\", self.rect_position, Vector2(1216, 656), 0.5, Tween.TRANS_SINE)
+	$Tween.start()
+"
+
+[sub_resource type="GDScript" id=48]
+script/source = "extends VSlider
+
+func _ready():
+	self.connect(\"value_changed\", self, \"_on_value_changed\")
+
+func _on_value_changed(value):
+	AudioServer.set_bus_volume_db(0, linear2db(value))
+"
 
 [node name="Game" type="Node"]
 script = SubResource( 1 )
@@ -1680,7 +1713,6 @@ __meta__ = {
 }
 
 [node name="TextureButton" type="TextureButton" parent="StartScreen/Control"]
-self_modulate = Color( 0, 0, 0, 0 )
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -1696,7 +1728,6 @@ __meta__ = {
 }
 
 [node name="TextureRect" type="TextureRect" parent="StartScreen/Control"]
-self_modulate = Color( 1, 1, 1, 0 )
 anchor_left = 0.5
 anchor_right = 0.5
 margin_left = -640.0
@@ -1709,10 +1740,10 @@ __meta__ = {
 }
 
 [node name="TextureRect2" type="TextureRect" parent="StartScreen/Control"]
-margin_left = 846.494
-margin_top = 724.963
-margin_right = 1404.49
-margin_bottom = 831.963
+margin_left = -1.445
+margin_top = 631.963
+margin_right = 556.551
+margin_bottom = 738.963
 rect_scale = Vector2( 0.8, 0.8 )
 texture = ExtResource( 13 )
 expand = true
@@ -1723,3 +1754,55 @@ __meta__ = {
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="StartScreen/Control"]
 anims/enter = SubResource( 44 )
+
+[node name="Volume" type="CanvasLayer" parent="."]
+pause_mode = 2
+layer = 6
+
+[node name="Volume" type="Panel" parent="Volume"]
+pause_mode = 2
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -64.0
+margin_top = -64.0
+margin_bottom = 256.0
+custom_styles/panel = SubResource( 46 )
+script = SubResource( 49 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureButton" type="TextureButton" parent="Volume/Volume"]
+anchor_right = 1.0
+margin_left = 8.0
+margin_top = 8.0
+margin_right = -8.0
+margin_bottom = 56.0
+mouse_filter = 1
+texture_normal = ExtResource( 14 )
+expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VSlider" type="VSlider" parent="Volume/Volume"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 8.0
+margin_top = 64.0
+margin_right = -8.0
+margin_bottom = -8.0
+mouse_default_cursor_shape = 2
+max_value = 1.0
+step = 0.05
+value = 1.0
+tick_count = 12
+ticks_on_borders = true
+script = SubResource( 48 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Tween" type="Tween" parent="Volume/Volume"]
