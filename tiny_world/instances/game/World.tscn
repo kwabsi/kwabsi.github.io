@@ -42,11 +42,13 @@ func _draw():
 
 func _on_game_currentNodes_changed():
 	for child in $Nodes.get_children():
-		$Nodes.remove_child(child)
+		if GameState.currentNodes.find(child) < 0:
+			$Nodes.remove_child(child)
 	for index in range(len(GameState.currentNodes)):
 		var _node = GameState.currentNodes[index]
+		if $Nodes.get_children().find(_node) < 0:
+			$Nodes.add_child(_node)
 		$Tween.interpolate_property(_node, \"rotation_degrees\", _node.rotation_degrees, (index * (360 / len(GameState.currentNodes))) + 180, 2.0, Tween.TRANS_SINE)
-		$Nodes.add_child(_node)
 	$Tween.interpolate_method(self, \"setRadius\", self.radius, ((CONSTANTS.NODE_DISTANCE * len(GameState.currentNodes)) / 2) / PI, 2.0, Tween.TRANS_SINE)
 	$Tween.start()
 "
