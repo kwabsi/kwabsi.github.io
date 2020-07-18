@@ -122,21 +122,23 @@ func destroyNode(_buildingNodeIndex:int):
 	emit_signal("currentNodes_changed")
 
 func triggerDestruction():
-	var _nodeId = randi() % len(currentNodes)
-	var _node = currentNodes[_nodeId]
-	destroyNode(_nodeId)
-	if len(currentNodes) == StartValues.startNodeCount - 1:
-		self.notifications.send(Notifications.INDEX.QUAKE_TUTORIAL)
-		self.skillProgress.activateSkill(Progress.SKILLS.FLG_ENVIRONMENT)
-	if len(currentNodes) == floor(3 * StartValues.startNodeCount / 4):
-		self.notifications.send(Notifications.INDEX.CHAIN_REACTION)
-	if len(currentNodes) == floor(StartValues.startNodeCount / 2):
-		self.notifications.send(Notifications.INDEX.TAUNT)
-	if len(currentNodes) == 5:
-		self.notifications.send(Notifications.INDEX.GAME_OVER)	
-	if skillProgress.hasSkill(Progress.SKILLS.ATOMIC_ENERGY) && _node.type == BuildingNodeFactory.TYPE.HOUSING:
-		triggerDestruction()
-		triggerDestruction()
+	if len(currentNodes) > 0:
+		var _nodeId = randi() % len(currentNodes)
+		var _node = currentNodes[_nodeId]
+		destroyNode(_nodeId)
+		if len(currentNodes) == StartValues.startNodeCount - 1:
+			self.notifications.send(Notifications.INDEX.QUAKE_TUTORIAL)
+			self.skillProgress.activateSkill(Progress.SKILLS.FLG_ENVIRONMENT)
+			Audio.playMusic(Audio.MUSIC.SENTINEL)
+		if len(currentNodes) == floor(3 * StartValues.startNodeCount / 4):
+			self.notifications.send(Notifications.INDEX.CHAIN_REACTION)
+		if len(currentNodes) == floor(StartValues.startNodeCount / 2):
+			self.notifications.send(Notifications.INDEX.TAUNT)
+		if len(currentNodes) == 5:
+			self.notifications.send(Notifications.INDEX.GAME_OVER)	
+		if skillProgress.hasSkill(Progress.SKILLS.ATOMIC_ENERGY) && _node.type == BuildingNodeFactory.TYPE.HOUSING:
+			triggerDestruction()
+			triggerDestruction()
 
 func _process(_delta):
 	if Input.is_action_just_pressed("ui_up"):
@@ -180,7 +182,6 @@ func restart(reloadTree = true):
 	emit_signal("currentNodes_changed")
 	emit_signal("skills_changed")
 	self.set_physics_process(true)
-	
 
 func _init():
 	restart(false)

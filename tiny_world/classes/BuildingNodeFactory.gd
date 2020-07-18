@@ -19,13 +19,13 @@ var buildingPropertyDict = {
 		PRODUCTION.LUMBERYARD: BuildingProperty.new(-5, 2, 0, 1, 10, "res://instances/game/production/Lumberyard.tscn"),
 		PRODUCTION.MINE: BuildingProperty.new(-20, 10, 0, 5, 30, "res://instances/game/production/Mine.tscn"),
 		PRODUCTION.REFINERY: BuildingProperty.new(-5, 20, 0, 20, 50, "res://instances/game/production/Refinery.tscn"),
-		PRODUCTION.FACTORY: BuildingProperty.new(-20, 50, 0, 20, 500, "res://instances/game/production/Factory.tscn"),
+		PRODUCTION.FACTORY: BuildingProperty.new(-20, 50, 0, 30, 500, "res://instances/game/production/Factory.tscn"),
 		PRODUCTION.PRODUCTIONPLANT: BuildingProperty.new(-60, 100, 0, 50, 2000, "res://instances/game/production/ProductionPlant.tscn"),
 	},
 	TYPE.RESEARCH: {
 		RESEARCH.SCHOOL: BuildingProperty.new(-5, 0, 2, 0, 20, "res://instances/game/research/School.tscn"),
-		RESEARCH.MUSEUM: BuildingProperty.new(-2, 0, 2, 0, 60, "res://instances/game/research/Museum.tscn"),
-		RESEARCH.LIBRARY: BuildingProperty.new(-2, 0, 5, 0, 120, "res://instances/game/research/Library.tscn"),
+		RESEARCH.MUSEUM: BuildingProperty.new(-2, 0, 2, 0, 30, "res://instances/game/research/Museum.tscn"),
+		RESEARCH.LIBRARY: BuildingProperty.new(-2, 0, 5, 0, 60, "res://instances/game/research/Library.tscn"),
 		RESEARCH.COLLEGE: BuildingProperty.new(-50, 0, 30, 0, 300, "res://instances/game/research/College.tscn"),
 		RESEARCH.UNIVERSITY: BuildingProperty.new(-100, 0, 70, 0, 2000, "res://instances/game/research/University.tscn"),
 	},
@@ -85,6 +85,8 @@ class BuildingNode extends Node2D:
 		id = _id
 		type = _type
 		setProperties(_properties)
+		if type != TYPE.PASTURE:
+			Audio.playSound(Audio.SOUND.CONSTRUCTION)
 		
 	func destroy():
 		if get_node_or_null("../../..") != null:

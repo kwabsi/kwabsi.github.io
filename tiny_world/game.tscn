@@ -1,4 +1,4 @@
-[gd_scene load_steps=57 format=2]
+[gd_scene load_steps=59 format=2]
 
 [ext_resource path="res://instances/game/World.tscn" type="PackedScene" id=1]
 [ext_resource path="res://instances/ui/Theme.tres" type="Theme" id=2]
@@ -26,6 +26,7 @@ func _ready():
 	timer.connect(\"timeout\", timer, \"queue_free\")
 	timer.start(2)
 	GameState.connect(\"game_paused_changed\", self, \"_on_unpause\")
+	Audio.playMusic(Audio.MUSIC.BNW)
 	
 func _on_unpause():
 	if !$World/World.visible:
@@ -33,6 +34,57 @@ func _on_unpause():
 "
 
 [sub_resource type="GDScript" id=2]
+script/source = "extends Polygon2D
+
+const INTERVAL = 3.0
+var _interval:float = 0.0
+
+enum STATE { FINE, NOT_FINE, ENDANGERED, DED }
+
+var state = STATE.FINE setget setState
+
+var fineColor = Color(\"72c1ce\")
+var notFineColor = Color(\"64887c\")
+var endangeredColor = Color(\"7b571a\")
+var dedColor = Color(\"201916\")
+
+func setState(value):
+	if value != state:
+		state = value
+		match state:
+			STATE.FINE:
+				tweenColor(fineColor)
+			STATE.NOT_FINE:
+				tweenColor(notFineColor)
+			STATE.ENDANGERED:
+				tweenColor(endangeredColor)
+			STATE.DED:
+				tweenColor(dedColor)
+
+func checkState():
+	var _degradationTime = GameState.getPollutionCapacity() / max(GameState.getPollutionPerSecond(), 0.1)
+	if _degradationTime >= 80.0:
+		self.state = STATE.FINE
+	elif _degradationTime >= 40.0:
+		self.state = STATE.NOT_FINE
+	elif _degradationTime >= 10.0:
+		self.state = STATE.ENDANGERED
+	else:
+		self.state = STATE.DED
+
+func tweenColor(_color):
+	$Tween.remove_all()
+	$Tween.interpolate_property(self, \"color\", self.color, _color, 10.0, Tween.TRANS_SINE)
+	$Tween.start()
+
+func _physics_process(delta):
+	_interval += delta
+	if _interval >= INTERVAL:
+		_interval -= INTERVAL
+		checkState()
+"
+
+[sub_resource type="GDScript" id=3]
 script/source = "extends Node2D
 
 const INTERVAL = 0.1
@@ -83,7 +135,7 @@ func _on_skills_changed():
 			visible = true
 "
 
-[sub_resource type="GDScript" id=3]
+[sub_resource type="GDScript" id=4]
 script/source = "extends Camera2D
 
 export var minZoom:float = 3.0
@@ -123,10 +175,10 @@ func _on_nodes_changed():
 		
 "
 
-[sub_resource type="StyleBoxFlat" id=4]
+[sub_resource type="StyleBoxFlat" id=5]
 bg_color = Color( 0, 0, 0, 0.607843 )
 
-[sub_resource type="GDScript" id=5]
+[sub_resource type="GDScript" id=6]
 script/source = "extends Panel
 
 const INTERVAL = 0.5
@@ -142,7 +194,7 @@ func _process(delta):
 		updateText()
 "
 
-[sub_resource type="GDScript" id=6]
+[sub_resource type="GDScript" id=7]
 script/source = "extends Panel
 
 
@@ -153,11 +205,11 @@ func _on_change(__):
 	GameState.populationWeight = $HSlider.value
 "
 
-[sub_resource type="StyleBoxFlat" id=7]
+[sub_resource type="StyleBoxFlat" id=8]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_bottom_left = 24
 
-[sub_resource type="GDScript" id=8]
+[sub_resource type="GDScript" id=9]
 script/source = "extends Panel
 
 const INTERVAL = 0.5
@@ -173,11 +225,11 @@ func _process(delta):
 		updateText()
 "
 
-[sub_resource type="StyleBoxFlat" id=9]
+[sub_resource type="StyleBoxFlat" id=10]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_bottom_left = 24
 
-[sub_resource type="GDScript" id=10]
+[sub_resource type="GDScript" id=11]
 script/source = "extends Panel
 
 const INTERVAL = 0.5
@@ -197,11 +249,11 @@ func _process(delta):
 		updateText()
 "
 
-[sub_resource type="StyleBoxFlat" id=11]
+[sub_resource type="StyleBoxFlat" id=12]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_bottom_right = 24
 
-[sub_resource type="GDScript" id=12]
+[sub_resource type="GDScript" id=13]
 script/source = "extends Panel
 
 const INTERVAL = 0.5
@@ -217,11 +269,11 @@ func _process(delta):
 		updateText()
 "
 
-[sub_resource type="StyleBoxFlat" id=13]
+[sub_resource type="StyleBoxFlat" id=14]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_bottom_right = 24
 
-[sub_resource type="GDScript" id=14]
+[sub_resource type="GDScript" id=15]
 script/source = "extends Panel
 
 const INTERVAL = 0.5
@@ -241,12 +293,12 @@ func _process(delta):
 		updateText()
 "
 
-[sub_resource type="StyleBoxFlat" id=15]
+[sub_resource type="StyleBoxFlat" id=16]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="GDScript" id=16]
+[sub_resource type="GDScript" id=17]
 script/source = "extends Panel
 
 const INTERVAL = 0.25
@@ -264,7 +316,7 @@ func _process(delta):
 		updateText()
 "
 
-[sub_resource type="GDScript" id=17]
+[sub_resource type="GDScript" id=18]
 script/source = "extends Panel
 
 const INTERVAL = 0.25
@@ -282,7 +334,7 @@ func _process(delta):
 		updateText()
 "
 
-[sub_resource type="GDScript" id=18]
+[sub_resource type="GDScript" id=19]
 script/source = "extends Control
 
 var BuildButton = preload(\"res://instances/ui/BuildButton.tscn\")
@@ -300,12 +352,12 @@ func _on_game_currentNodes_changed():
 		add_child(button)
 "
 
-[sub_resource type="StyleBoxFlat" id=19]
+[sub_resource type="StyleBoxFlat" id=20]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_top_left = 24
 corner_radius_top_right = 24
 
-[sub_resource type="GDScript" id=20]
+[sub_resource type="GDScript" id=21]
 script/source = "extends Button
 
 func _ready():
@@ -315,7 +367,7 @@ func _on_pressed():
 	GameState.setZoom(GameState.zoom - $\"../ZoomSlider\".step)
 "
 
-[sub_resource type="GDScript" id=21]
+[sub_resource type="GDScript" id=22]
 script/source = "extends Button
 
 func _ready():
@@ -325,7 +377,7 @@ func _on_pressed():
 	GameState.setZoom(GameState.zoom + $\"../ZoomSlider\".step)
 "
 
-[sub_resource type="GDScript" id=22]
+[sub_resource type="GDScript" id=23]
 script/source = "extends HSlider
 
 
@@ -341,29 +393,9 @@ func _on_zoom_changed():
 	self.value = GameState.zoom
 "
 
-[sub_resource type="StyleBoxFlat" id=23]
+[sub_resource type="StyleBoxFlat" id=24]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_bottom_left = 24
-
-[sub_resource type="GDScript" id=24]
-script/source = "extends TextureButton
-
-
-func _ready():
-	self.connect(\"pressed\", self, \"_on_pressed\")
-	GameState.connect(\"game_speed_changed\", self, \"_on_game_speed_change\")
-	self.self_modulate = Color(1, 1, 1, 0.5)
-
-	
-func _on_pressed():
-	GameState.setGameSpeed(4)
-
-func _on_game_speed_change(_newSpeed):
-	if _newSpeed == 4:
-		self.self_modulate = Color.white
-	else:
-		self.self_modulate = Color(1, 1, 1, 0.5)
-"
 
 [sub_resource type="GDScript" id=25]
 script/source = "extends TextureButton
@@ -376,10 +408,11 @@ func _ready():
 
 	
 func _on_pressed():
-	GameState.setGameSpeed(2)
+	Audio.playSound(Audio.SOUND.CLICK)
+	GameState.setGameSpeed(4)
 
 func _on_game_speed_change(_newSpeed):
-	if _newSpeed == 2:
+	if _newSpeed == 4:
 		self.self_modulate = Color.white
 	else:
 		self.self_modulate = Color(1, 1, 1, 0.5)
@@ -392,10 +425,32 @@ script/source = "extends TextureButton
 func _ready():
 	self.connect(\"pressed\", self, \"_on_pressed\")
 	GameState.connect(\"game_speed_changed\", self, \"_on_game_speed_change\")
+	self.self_modulate = Color(1, 1, 1, 0.5)
+
+	
+func _on_pressed():
+	Audio.playSound(Audio.SOUND.CLICK)
+	GameState.setGameSpeed(2)
+
+func _on_game_speed_change(_newSpeed):
+	if _newSpeed == 2:
+		self.self_modulate = Color.white
+	else:
+		self.self_modulate = Color(1, 1, 1, 0.5)
+"
+
+[sub_resource type="GDScript" id=27]
+script/source = "extends TextureButton
+
+
+func _ready():
+	self.connect(\"pressed\", self, \"_on_pressed\")
+	GameState.connect(\"game_speed_changed\", self, \"_on_game_speed_change\")
 	self.self_modulate = Color(1, 1, 1, 1)
 
 	
 func _on_pressed():
+	Audio.playSound(Audio.SOUND.CLICK)
 	GameState.setGameSpeed(1)
 
 func _on_game_speed_change(_newSpeed):
@@ -405,12 +460,12 @@ func _on_game_speed_change(_newSpeed):
 		self.self_modulate = Color(1, 1, 1, 0.5)
 "
 
-[sub_resource type="StyleBoxFlat" id=27]
+[sub_resource type="StyleBoxFlat" id=28]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 
-[sub_resource type="GDScript" id=28]
+[sub_resource type="GDScript" id=29]
 script/source = "extends Panel
 
 var popIcon = preload(\"res://assets/graphics/icons/population.png\")
@@ -483,12 +538,12 @@ func _on_unhover(__, ___):
 	$Tween.start()
 "
 
-[sub_resource type="StyleBoxFlat" id=29]
+[sub_resource type="StyleBoxFlat" id=30]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_top_left = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="GDScript" id=30]
+[sub_resource type="GDScript" id=31]
 script/source = "extends Panel
 
 var visibleVector = Vector2(1216, 72)
@@ -505,6 +560,7 @@ func _on_message_queue_empty():
 	$Tween.start()
 	
 func _on_notification(__):
+	Audio.playSound(Audio.SOUND.PAPER)
 	$Tween.remove_all()
 	$Tween.interpolate_property(self, \"rect_position\", rect_position, visibleVector, 0.5, Tween.TRANS_SINE)
 	$Tween.start()
@@ -513,14 +569,19 @@ func _on_pressed():
 	$\"../MessageBox\".visible = true
 "
 
-[sub_resource type="GDScript" id=31]
+[sub_resource type="GDScript" id=32]
 script/source = "extends Control
+
+const INTERVAL = 0.3
+var _currentInterval = 0.0
 
 var cursor:int = -1
 onready var list:Array = []
 
 var visibleVector = Vector2(0, 144)
 var invisibleVector = Vector2(-330, 144)
+
+var allUpgrades = false
 
 func _ready():
 	GameState.connect(\"game_paused_changed\", self, \"_on_pause_change\")
@@ -530,27 +591,50 @@ func _ready():
 	list = Progress.SKILLS.values()
 	getNext()
 	
+func _physics_process(delta):
+	_currentInterval += delta
+	if _currentInterval >= INTERVAL:
+		_currentInterval -= INTERVAL
+		updatePanel()
+	
 func getNext(mod = 1):
+	if cursor >= 0:
+		Audio.playSound(Audio.SOUND.WEAK_CLICK)
 	cursor = (len(list) + (cursor + mod)) % len(list)
-	while (GameState.skillProgress.hasSkill(list[cursor]) or !GameState.skillProgress.canLearn(list[cursor])):
+	var _i = len(list)
+	while _i > 0 and (GameState.skillProgress.hasSkill(list[cursor]) or !GameState.skillProgress.canLearn(list[cursor])):
 		cursor = (len(list) + (cursor + mod)) % len(list)
-	updatePanel()
+		_i -= 1
+	if _i <= 0:
+		allUpgrades = true
+		$Tween.remove_all()
+		$Tween.interpolate_property(self, \"rect_position\", self.rect_position, invisibleVector, 0.5, Tween.TRANS_SINE)
+		$Tween.start()
+	else:
+		updatePanel()
 	
 func updatePanel():
 	var skill = GameState.skillProgress.skillDict.get(list[cursor])
 	$TitlePanel/Label.text = skill.label
 	$Description/Label.text = skill.description
-	$CostPanel/TextureButton/Label.text = \"Build (Cost: \" + str(skill.cost) + \")\"
+	$CostPanel/TextureButton/Label.text = \"Research (Cost: \" + str(skill.cost) + \")\"
+	if skill.cost > GameState.getResearch():
+		$CostPanel.modulate = Color.red
+	else:
+		$CostPanel.modulate = Color.white
 
 func _on_research():
 	var skill = GameState.skillProgress.skillDict.get(list[cursor])
 	if skill.cost <= GameState.getResearch():
+		Audio.playSound(Audio.SOUND.CLICK)
 		GameState.resources.changeResearch(-1 * skill.cost)
 		GameState.skillProgress.activateSkill(list[cursor])
 		getNext()
 		updatePanel()
 
 func _on_pause_change():
+	if allUpgrades:
+		return
 	$Tween.remove_all()
 	if get_tree().paused:
 		$Tween.interpolate_property(self, \"rect_position\", self.rect_position, invisibleVector, 0.5, Tween.TRANS_SINE)
@@ -559,32 +643,39 @@ func _on_pause_change():
 	$Tween.start()
 "
 
-[sub_resource type="StyleBoxFlat" id=32]
+[sub_resource type="StyleBoxFlat" id=33]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_top_right = 24
 
-[sub_resource type="DynamicFont" id=33]
+[sub_resource type="DynamicFont" id=34]
 size = 26
 outline_size = 2
 outline_color = Color( 0, 0, 0, 1 )
 use_filter = true
 font_data = ExtResource( 9 )
 
-[sub_resource type="StyleBoxFlat" id=34]
+[sub_resource type="StyleBoxFlat" id=35]
 bg_color = Color( 0, 0, 0, 0.607843 )
 
-[sub_resource type="DynamicFont" id=35]
+[sub_resource type="DynamicFont" id=36]
 size = 20
 outline_size = 2
 outline_color = Color( 0, 0, 0, 1 )
 use_filter = true
 font_data = ExtResource( 9 )
 
-[sub_resource type="StyleBoxFlat" id=36]
+[sub_resource type="StyleBoxFlat" id=37]
 bg_color = Color( 0, 0, 0, 0.607843 )
 corner_radius_bottom_right = 24
 
-[sub_resource type="GDScript" id=37]
+[sub_resource type="DynamicFont" id=45]
+size = 26
+outline_size = 2
+outline_color = Color( 0, 0, 0, 1 )
+use_filter = true
+font_data = ExtResource( 9 )
+
+[sub_resource type="GDScript" id=38]
 script/source = "extends Control
 
 signal queue_empty()
@@ -625,7 +716,7 @@ func _on_close():
 	GameState.unpause()
 "
 
-[sub_resource type="StyleBoxFlat" id=38]
+[sub_resource type="StyleBoxFlat" id=39]
 bg_color = Color( 0, 0, 0, 1 )
 border_width_left = 4
 border_width_top = 4
@@ -638,7 +729,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="GDScript" id=39]
+[sub_resource type="GDScript" id=40]
 script/source = "extends Control
 
 
@@ -653,7 +744,7 @@ func _physics_process(_d):
 				visible = true
 "
 
-[sub_resource type="GDScript" id=40]
+[sub_resource type="GDScript" id=41]
 script/source = "extends Button
 
 
@@ -666,7 +757,7 @@ func _on_pressed():
 	GameState.restart()
 "
 
-[sub_resource type="GDScript" id=41]
+[sub_resource type="GDScript" id=42]
 script/source = "extends Button
 
 
@@ -677,7 +768,7 @@ func _on_pressed():
 	get_tree().quit()
 "
 
-[sub_resource type="GDScript" id=42]
+[sub_resource type="GDScript" id=43]
 script/source = "extends Control
 
 
@@ -690,8 +781,7 @@ func _on_start():
 	self.visible = false
 "
 
-[sub_resource type="Animation" id=43]
-resource_name = "enter"
+[sub_resource type="Animation" id=44]
 length = 2.0
 tracks/0/type = "value"
 tracks/0/path = NodePath("TextureRect:self_modulate")
@@ -740,9 +830,12 @@ follow_viewport_enable = true
 [node name="Background" type="Polygon2D" parent="World"]
 color = Color( 0.447059, 0.756863, 0.807843, 1 )
 polygon = PoolVector2Array( -1280, -720, 2560, -720, 2560, 1440, -1280, 1440 )
+script = SubResource( 2 )
 __meta__ = {
 "_edit_lock_": true
 }
+
+[node name="Tween" type="Tween" parent="World/Background"]
 
 [node name="World" parent="World" instance=ExtResource( 1 )]
 visible = false
@@ -753,14 +846,14 @@ stableColor = Color( 0.105882, 0.47451, 0.0745098, 1 )
 [node name="DoomsdayClock" type="Node2D" parent="World"]
 visible = false
 position = Vector2( 640, 360 )
-script = SubResource( 2 )
+script = SubResource( 3 )
 
 [node name="Camera2D" type="Camera2D" parent="World"]
 pause_mode = 2
 position = Vector2( 640, 360 )
 current = true
 zoom = Vector2( 0.4, 0.4 )
-script = SubResource( 3 )
+script = SubResource( 4 )
 
 [node name="Tween" type="Tween" parent="World/Camera2D"]
 
@@ -796,8 +889,8 @@ __meta__ = {
 margin_left = 192.0
 margin_right = 384.0
 margin_bottom = 48.0
-custom_styles/panel = SubResource( 4 )
-script = SubResource( 5 )
+custom_styles/panel = SubResource( 5 )
+script = SubResource( 6 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -835,8 +928,8 @@ margin_left = 192.0
 margin_top = 48.0
 margin_right = 384.0
 margin_bottom = 96.0
-custom_styles/panel = SubResource( 4 )
-script = SubResource( 6 )
+custom_styles/panel = SubResource( 5 )
+script = SubResource( 7 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -856,8 +949,8 @@ __meta__ = {
 [node name="MaterialsPanel" type="Panel" parent="UI/UI/Numbers"]
 margin_right = 192.0
 margin_bottom = 48.0
-custom_styles/panel = SubResource( 7 )
-script = SubResource( 8 )
+custom_styles/panel = SubResource( 8 )
+script = SubResource( 9 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -895,8 +988,8 @@ margin_left = 32.0
 margin_top = 48.0
 margin_right = 192.0
 margin_bottom = 96.0
-custom_styles/panel = SubResource( 9 )
-script = SubResource( 10 )
+custom_styles/panel = SubResource( 10 )
+script = SubResource( 11 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -920,8 +1013,8 @@ __meta__ = {
 margin_left = 384.0
 margin_right = 576.0
 margin_bottom = 48.0
-custom_styles/panel = SubResource( 11 )
-script = SubResource( 12 )
+custom_styles/panel = SubResource( 12 )
+script = SubResource( 13 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -959,8 +1052,8 @@ margin_left = 384.0
 margin_top = 48.0
 margin_right = 544.0
 margin_bottom = 96.0
-custom_styles/panel = SubResource( 13 )
-script = SubResource( 14 )
+custom_styles/panel = SubResource( 14 )
+script = SubResource( 15 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -985,8 +1078,8 @@ margin_left = 384.0
 margin_top = 96.0
 margin_right = 512.0
 margin_bottom = 120.0
-custom_styles/panel = SubResource( 15 )
-script = SubResource( 16 )
+custom_styles/panel = SubResource( 16 )
+script = SubResource( 17 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1015,8 +1108,8 @@ margin_left = 64.0
 margin_top = 96.0
 margin_right = 192.0
 margin_bottom = 120.0
-custom_styles/panel = SubResource( 15 )
-script = SubResource( 17 )
+custom_styles/panel = SubResource( 16 )
+script = SubResource( 18 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1041,7 +1134,7 @@ __meta__ = {
 [node name="Tween" type="Tween" parent="UI/UI/Numbers/MaterialEffectivity"]
 
 [node name="BuildingButtons" type="Control" parent="UI/UI"]
-script = SubResource( 18 )
+script = SubResource( 19 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1054,7 +1147,7 @@ anchor_bottom = 1.0
 margin_left = -192.0
 margin_top = -48.0
 margin_right = 192.0
-custom_styles/panel = SubResource( 19 )
+custom_styles/panel = SubResource( 20 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1067,7 +1160,7 @@ focus_mode = 0
 enabled_focus_mode = 0
 text = "-"
 flat = true
-script = SubResource( 20 )
+script = SubResource( 21 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1082,7 +1175,7 @@ focus_mode = 0
 enabled_focus_mode = 0
 text = "+"
 flat = true
-script = SubResource( 21 )
+script = SubResource( 22 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1096,7 +1189,7 @@ max_value = 1.0
 step = 0.05
 tick_count = 11
 ticks_on_borders = true
-script = SubResource( 22 )
+script = SubResource( 23 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1113,7 +1206,7 @@ anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -176.0
 margin_bottom = 48.0
-custom_styles/panel = SubResource( 23 )
+custom_styles/panel = SubResource( 24 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1130,7 +1223,7 @@ mouse_default_cursor_shape = 2
 enabled_focus_mode = 0
 texture_normal = ExtResource( 6 )
 expand = true
-script = SubResource( 24 )
+script = SubResource( 25 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1147,7 +1240,7 @@ mouse_default_cursor_shape = 2
 enabled_focus_mode = 0
 texture_normal = ExtResource( 7 )
 expand = true
-script = SubResource( 25 )
+script = SubResource( 26 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1164,7 +1257,7 @@ mouse_default_cursor_shape = 2
 enabled_focus_mode = 0
 texture_normal = ExtResource( 8 )
 expand = true
-script = SubResource( 26 )
+script = SubResource( 27 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1175,8 +1268,8 @@ anchor_right = 0.25
 anchor_bottom = 0.8
 margin_left = -320.0
 margin_right = -320.0
-custom_styles/panel = SubResource( 27 )
-script = SubResource( 28 )
+custom_styles/panel = SubResource( 28 )
+script = SubResource( 29 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1267,8 +1360,8 @@ anchor_right = 1.0
 anchor_bottom = 0.1
 margin_right = 64.0
 margin_bottom = 64.0
-custom_styles/panel = SubResource( 29 )
-script = SubResource( 30 )
+custom_styles/panel = SubResource( 30 )
+script = SubResource( 31 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1295,7 +1388,7 @@ anchor_bottom = 0.2
 margin_left = -330.0
 margin_right = -3.05176e-05
 margin_bottom = 424.0
-script = SubResource( 31 )
+script = SubResource( 32 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1303,7 +1396,7 @@ __meta__ = {
 [node name="TitlePanel" type="Panel" parent="UI/UI/Upgrades"]
 anchor_right = 1.0
 margin_bottom = 99.0
-custom_styles/panel = SubResource( 32 )
+custom_styles/panel = SubResource( 33 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1313,7 +1406,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 64.0
 margin_right = -64.0
-custom_fonts/font = SubResource( 33 )
+custom_fonts/font = SubResource( 34 )
 text = "Upgrade Name"
 align = 1
 autowrap = true
@@ -1366,7 +1459,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = 101.0
 margin_bottom = -50.0
-custom_styles/panel = SubResource( 34 )
+custom_styles/panel = SubResource( 35 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1376,7 +1469,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 8.0
 margin_right = -8.0
-custom_fonts/font = SubResource( 35 )
+custom_fonts/font = SubResource( 36 )
 text = "This contains a lot of text, that shows you what this upgrade does and stuff.
 "
 autowrap = true
@@ -1391,7 +1484,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = -48.0
 margin_bottom = 2.0
-custom_styles/panel = SubResource( 36 )
+custom_styles/panel = SubResource( 37 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1422,9 +1515,9 @@ __meta__ = {
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 48.0
-margin_top = -4.0
 margin_right = -8.0
-text = "Build (Cost: 44444)"
+custom_fonts/font = SubResource( 45 )
+text = "Research (Cost: 44444)"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1435,7 +1528,7 @@ __meta__ = {
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = SubResource( 37 )
+script = SubResource( 38 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1450,7 +1543,7 @@ anchor_left = 0.2
 anchor_top = 0.1
 anchor_right = 0.8
 anchor_bottom = 0.8
-custom_styles/panel = SubResource( 38 )
+custom_styles/panel = SubResource( 39 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1519,7 +1612,7 @@ visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme = ExtResource( 2 )
-script = SubResource( 39 )
+script = SubResource( 40 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1546,7 +1639,7 @@ margin_bottom = 20.0
 focus_mode = 0
 enabled_focus_mode = 0
 text = "Restart"
-script = SubResource( 40 )
+script = SubResource( 41 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1562,7 +1655,7 @@ margin_bottom = 20.0
 focus_mode = 0
 enabled_focus_mode = 0
 text = "Quit"
-script = SubResource( 41 )
+script = SubResource( 42 )
 
 [node name="StartScreen" type="CanvasLayer" parent="."]
 layer = 5
@@ -1571,7 +1664,7 @@ layer = 5
 pause_mode = 2
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = SubResource( 42 )
+script = SubResource( 43 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1629,4 +1722,4 @@ __meta__ = {
 }
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="StartScreen/Control"]
-anims/enter = SubResource( 43 )
+anims/enter = SubResource( 44 )

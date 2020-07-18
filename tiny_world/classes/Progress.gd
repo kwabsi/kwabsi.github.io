@@ -21,7 +21,7 @@ enum SKILLS {
 	
 	DOOMSDAY_CLOCK,
 	
-	FLG_ENVIRONMENT,
+	FLG_ENVIRONMENT, FLG_CLEAN, FLG_CORRUPTABLE
 }
 
 var skillDict = {}
@@ -43,8 +43,8 @@ func _init_skillDict():
 		SKILLS.REFINERY: Skill.new("Refinery Building", "A refinery, which directly drains the resources from the planet. Requires less people, but also creates more wealth.", 50, [SKILLS.MINE]),
 		SKILLS.FACTORY: Skill.new("Factory Building", "A place stuff is turned into things.", 200, [SKILLS.REFINERY]),
 		SKILLS.PRODUCTIONPLANT: Skill.new("Production Plant Building", "Produces a lot of wealth made by a lot of people.", 500, [SKILLS.FACTORY]),
-		SKILLS.MUSEUM: Skill.new("Museum Building", "Preserve knowledge while fostering the thirst for more.", 50, [SKILLS.SCHOOL]),
-		SKILLS.LIBRARY: Skill.new("Library Building", "A place to study the wisdom of the ages at your own pace.", 50, [SKILLS.MUSEUM]),
+		SKILLS.MUSEUM: Skill.new("Museum Building", "Preserve knowledge while fostering the thirst for more.", 20, [SKILLS.SCHOOL]),
+		SKILLS.LIBRARY: Skill.new("Library Building", "A place to study the wisdom of the ages at your own pace.", 20, [SKILLS.MUSEUM]),
 		SKILLS.COLLEGE: Skill.new("College Building", "Higher education for everybody.", 100, [SKILLS.LIBRARY]),
 		SKILLS.UNIVERSITY: Skill.new("University Building", "A monument to knowledge and unfettered minds.", 500, [SKILLS.COLLEGE]),
 		
@@ -53,13 +53,13 @@ func _init_skillDict():
 		SKILLS.PARKS: Skill.new("Parks and Recreation", "Make Cities more attractive to live in by building more parks. Increase City Population by 50% and decrease pollution by 20%", 200, [SKILLS.CITY, SKILLS.ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_parks")),
 		SKILLS.PUBLIC_TRANSPORTATION: Skill.new("Public Transportation", "Invest in busses and trains to decrease pollution. Decrease City and Metropolis pollution by 50%.", 1000, [SKILLS.METROPOLIS, SKILLS.ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_public_transport")),
 		
-		SKILLS.RIGHT_VIOLATION: Skill.new("Human Right Violation", "Ignore a few suggestions made by law to improve profit. Decrease required Population of Mines by 25%.", 100, [SKILLS.MINE], funcref(self, "_skill_right_violation")),
-		SKILLS.FRACKING: Skill.new("Hydraulic Fracturing", "Research new ways to make your Refineries more profitable. Increase everything Refineries produce by 20%.", 200, [SKILLS.REFINERY], funcref(self, "_skill_fracking")),
-		SKILLS.SWEATSHOPS: Skill.new("Sweatshops", "Cut corners and rise to the top. Increase everything Factories produce by 40% and decrease the required population by 20%.", 500, [SKILLS.FACTORY, SKILLS.RIGHT_VIOLATION], funcref(self, "_skill_sweatshops")),
-		SKILLS.CHILD_LABOUR: Skill.new("Child Labour", "Tap into the untapped market of young people to fill your production chains. Increase profits of Factories and Production Plants by 20% and decrease required Population by 20%.", 2000, [SKILLS.PRODUCTIONPLANT, SKILLS.SWEATSHOPS], funcref(self, "_skill_child_labour")),
+		SKILLS.RIGHT_VIOLATION: Skill.new("Human Right Violation", "Ignore a few suggestions made by law to improve profit. Decrease required Population of Mines by 25%.", 10, [SKILLS.MINE, SKILLS.FLG_CORRUPTABLE], funcref(self, "_skill_right_violation")),
+		SKILLS.FRACKING: Skill.new("Hydraulic Fracturing", "Research new ways to make your Refineries more profitable. Increase everything Refineries produce by 20%.", 20, [SKILLS.REFINERY, SKILLS.FLG_CORRUPTABLE], funcref(self, "_skill_fracking")),
+		SKILLS.SWEATSHOPS: Skill.new("Sweatshops", "Cut corners and rise to the top. Increase everything Factories produce by 40% and decrease the required population by 20%.", 40, [SKILLS.FACTORY, SKILLS.RIGHT_VIOLATION], funcref(self, "_skill_sweatshops")),
+		SKILLS.CHILD_LABOUR: Skill.new("Child Labour", "Tap into the untapped market of young people to fill your production chains. Increase profits of Factories and Production Plants by 20% and decrease required Population by 20%.", 200, [SKILLS.PRODUCTIONPLANT, SKILLS.SWEATSHOPS], funcref(self, "_skill_child_labour")),
 	
-		SKILLS.ETHICAL_MINING: Skill.new("Ethical Mining", "Implement proper safety precautions for your mines. Decrease Pollution of Mines by 50%, but also decrease Material production by 30%.", 100, [SKILLS.MINE], funcref(self, "_skill_ethical_mining")),
-		SKILLS.CLEAN_OIL: Skill.new("Clean Oil", "Discover ways of making oil extraction safer and consumption cleaner. Decrease Pollution of Refineries by 50%, but also increase the required population by 200%.", 100, [SKILLS.MINE], funcref(self, "_skill_clean_oil")),
+		SKILLS.ETHICAL_MINING: Skill.new("Ethical Mining", "Implement proper safety precautions for your mines. Decrease Pollution of Mines by 50%, but also decrease Material production by 30%.", 100, [SKILLS.ENVIRONMENTAL_RESEARCH, SKILLS.MINE, SKILLS.FLG_CLEAN], funcref(self, "_skill_ethical_mining")),
+		SKILLS.CLEAN_OIL: Skill.new("Clean Oil", "Discover ways of making oil extraction safer and consumption cleaner. Decrease Pollution of Refineries by 50%, but also increase the required population by 200%.", 100, [SKILLS.ENVIRONMENTAL_RESEARCH, SKILLS.REFINERY, SKILLS.FLG_CLEAN], funcref(self, "_skill_clean_oil")),
 	
 		SKILLS.ACTIVITIES: Skill.new("Out of School Activities", "Invest into out of school activities to awaken interests early. Increase Research Speed of Schools by 40%.", 20, [SKILLS.SCHOOL], funcref(self, "_skill_activities")),
 		SKILLS.GUIDES: Skill.new("Interactive Tour Guides", "Make museum tours more exciting and interesting by employing tour guides. Increase Research Speed of Museums by 40%.", 100, [SKILLS.MUSEUM], funcref(self, "_skill_guides")),
@@ -67,20 +67,22 @@ func _init_skillDict():
 		SKILLS.OPTIONAL_COURSES: Skill.new("Optional Classes", "Provide a variety of optional modules for the students. Increase Research Speed of Colleges by 40%.", 300, [SKILLS.COLLEGE], funcref(self, "_skill_optional_courses")),
 		SKILLS.FACILITIES: Skill.new("Science Facilities", "Invest further in your universities to allow science to happen . Increase Research Speed of Universities by 40%.", 1000, [SKILLS.UNIVERSITY], funcref(self, "_skill_facilities")),
 	
-		SKILLS.CLEAN_ENERGY: Skill.new("Clean Energy", "Develop and deploy clean ways to generate electricity. Decrease Pollution by 10%.", 20, [SKILLS.ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_clean_energy")),
-		SKILLS.WASTE_MANAGEMENT: Skill.new("Waste Management", "Research ways to safely and cleanly dispose of waste. Decrease Pollution by 10%.", 40, [SKILLS.ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_waste_management")),
-		SKILLS.GREEN_LAWS: Skill.new("Green Laws", "Enforce Laws that protect the environment. Decrease Pollution by 20%, but also decrease overall material production by 10%.", 100, [SKILLS.ENVIRONMENTAL_RESEARCH, SKILLS.CITY], funcref(self, "_skill_green_laws")),
+		SKILLS.CLEAN_ENERGY: Skill.new("Clean Energy", "Develop and deploy clean ways to generate electricity. Decrease Pollution by 10%.", 40, [SKILLS.ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_clean_energy")),
+		SKILLS.WASTE_MANAGEMENT: Skill.new("Waste Management", "Research ways to safely and cleanly dispose of waste. Decrease Pollution by 10%.", 80, [SKILLS.ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_waste_management")),
+		SKILLS.GREEN_LAWS: Skill.new("Green Laws", "Enforce Laws that protect the environment. Decrease Pollution by 20%, but also decrease overall material production by 10%.", 120, [SKILLS.ENVIRONMENTAL_RESEARCH, SKILLS.FLG_CLEAN, SKILLS.CITY], funcref(self, "_skill_green_laws")),
 		SKILLS.FACTORY_ACCOUNTABILITY: Skill.new("Factory Accountability", "Force factory owners to optimize production chains by creating additional laws. Decrease Pollution by 40%, but also decrease overall material production by 50%.", 1000, [SKILLS.ADVANCED_ENVIRONMENTAL_RESEARCH, SKILLS.FACTORY], funcref(self, "_skill_factory_accountability")),
 	
-		SKILLS.REFORESTATION: Skill.new("Reforestation", "Replant trees and reinvigorate nature. Increases Pollution Capacity by 50%.", 100, [SKILLS.ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_reforestation")),
-		SKILLS.NATURE_RESERVES: Skill.new("Nature Reserves", "Declare parts of the planet as nature reserves. Increases Pollution Capacity by 200%, but immediately let the planet shrink once.", 100, [SKILLS.ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_nature_reserves")),
-		SKILLS.TERRAFORMING: Skill.new("Terraforming", "Meticulously shape the environment to make it more resistant to further disasters. Increases Pollution Capacity by 100%.", 1000, [SKILLS.ADVANCED_ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_terraforming")),
+		SKILLS.REFORESTATION: Skill.new("Reforestation", "Replant trees and reinvigorate nature. Increases Pollution Capacity by 20%.", 200, [SKILLS.ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_reforestation")),
+		SKILLS.NATURE_RESERVES: Skill.new("Nature Reserves", "Declare parts of the planet as nature reserves. Increases Pollution Capacity by 50%, but immediately let the planet shrink once.", 300, [SKILLS.ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_nature_reserves")),
+		SKILLS.TERRAFORMING: Skill.new("Terraforming", "Meticulously shape the environment to make it more resistant to further disasters. Increases Pollution Capacity by 50%.", 1000, [SKILLS.ADVANCED_ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_terraforming")),
 		SKILLS.ATOMIC_ENERGY: Skill.new("Atomic Energy", "Decrease pollution by 50%, but each time a Housing Building get's destroyed by natural disaster, the planet will shrink two additional times.", 200, [SKILLS.ADVANCED_ENVIRONMENTAL_RESEARCH], funcref(self, "_skill_atomic_energy")),
 		SKILLS.CLEANER_ENERGY: Skill.new("Cleaner Energy", "Bring theorethical machineries beyond scientists wildest dreams to life. Decrease pollution by 20%.", 1000, [SKILLS.ADVANCED_ENVIRONMENTAL_RESEARCH, SKILLS.CLEAN_ENERGY], funcref(self, "_skill_cleaner_energy")),
 		SKILLS.GREEN_ZEITGEIST: Skill.new("Green Zeitgeist", "Increase awareness in the people about environment and nurture a society, which wants to preserve nature. Decrease pollution by 20%.", 1000, [SKILLS.ADVANCED_ENVIRONMENTAL_RESEARCH, SKILLS.CITY], funcref(self, "_skill_green_zeitgeist")),
 
 		SKILLS.BRIGHT_FUTURE: Skill.new("Bright Future", "End climate change.", 5000, [SKILLS.GREEN_ZEITGEIST, SKILLS.CLEANER_ENERGY, SKILLS.FACTORY_ACCOUNTABILITY, SKILLS.TERRAFORMING, SKILLS.FACILITIES], funcref(self, "_skill_bright_future")),
 		SKILLS.FLG_ENVIRONMENT: Skill.new("EnvFlag", "You shouldn't see this.", 0, [-1]),
+		SKILLS.FLG_CLEAN: Skill.new("CleanFlag", "You shouldn't see this.", 0, [-1]),
+		SKILLS.FLG_CORRUPTABLE: Skill.new("CorruptFlag", "You shouldn't see this.", 0, [-1]),
 	}
 
 var parent:Node
@@ -108,6 +110,8 @@ func _init(_parent:Node):
 	activateSkill(SKILLS.CAMP)
 	activateSkill(SKILLS.LUMBERYARD)
 	activateSkill(SKILLS.SCHOOL)
+	activateSkill(SKILLS.FLG_CLEAN)
+	activateSkill(SKILLS.FLG_CORRUPTABLE)
 	
 func _skill_parks():
 	parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.HOUSING][BuildingNodeFactory.HOUSING.CITY].housingCapacity = floor(1.5 * parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.HOUSING][BuildingNodeFactory.HOUSING.CITY].housingCapacity)
@@ -141,6 +145,7 @@ func _skill_child_labour():
 	parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.FACTORY].housingCapacity = ceil(0.8 * parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.FACTORY].housingCapacity)
 	parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT].materialsPerSecond = floor(1.2 * parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT].materialsPerSecond)
 	parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT].housingCapacity = ceil(0.8 * parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.PRODUCTIONPLANT].housingCapacity)
+	skillDict[SKILLS.FLG_CLEAN].learned = false
 
 func _skill_activities():
 	parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.RESEARCH][BuildingNodeFactory.RESEARCH.SCHOOL].researchPerSecond = ceil(1.4 * parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.RESEARCH][BuildingNodeFactory.RESEARCH.SCHOOL].researchPerSecond)
@@ -166,24 +171,26 @@ func _skill_waste_management():
 func _skill_green_laws():
 	GameState.pollutionMultiplier *= 0.8
 	GameState.materialMultiplier *= 0.9
+	skillDict[SKILLS.FLG_CORRUPTABLE].learned = false
 	
 func _skill_factory_accountability():
 	GameState.pollutionMultiplier *= 0.6
 	GameState.materialMultiplier *= 0.5
 	
 func _skill_reforestation():
-	GameState.capacityPerNode *= 1.5
+	GameState.capacityPerNode *= 1.2
 	
 func _skill_nature_reserves():
-	GameState.capacityPerNode *= 3
+	GameState.capacityPerNode *= 1.5
 	GameState.triggerDestruction()
 	
 func _skill_terraforming():
-	GameState.capacityPerNode *= 2
+	GameState.capacityPerNode *= 1.5
 	
 func _skill_ethical_mining():
 	parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.MINE].materialsPerSecond = floor(0.7 * parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.MINE].materialsPerSecond)
 	parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.MINE].footPrint = floor(0.5 * parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.MINE].footPrint)
+	skillDict[SKILLS.FLG_CORRUPTABLE].learned = false
 
 func _skill_clean_oil():
 	parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.REFINERY].housingCapacity = floor(2.0 * parent.buildingNodeFactory.buildingPropertyDict[BuildingNodeFactory.TYPE.PRODUCTION][BuildingNodeFactory.PRODUCTION.REFINERY].housingCapacity)
@@ -197,10 +204,13 @@ func _skill_cleaner_energy():
 	
 func _skill_green_zeitgeist():
 	GameState.pollutionMultiplier *= 0.8
+	skillDict[SKILLS.FLG_CORRUPTABLE].learned = false
 	
 func _skill_bright_future():
 	GameState.pollutionMultiplier = 0
 	GameState.notifications.send(Notifications.INDEX.WIN)
+	skillDict[SKILLS.FLG_CORRUPTABLE].learned = false
+	Audio.playMusic(Audio.MUSIC.BNW)
 
 class Skill:
 	var label:String
