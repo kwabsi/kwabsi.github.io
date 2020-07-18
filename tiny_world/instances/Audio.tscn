@@ -42,7 +42,7 @@ func playMusic(key:int):
 			$MusicCrossFade.interpolate_property(currentlyPlaying, \"volume_db\", currentlyPlaying.volume_db, -80, FADE, Tween.TRANS_EXPO, Tween.EASE_IN)
 			$MusicCrossFade.interpolate_callback(currentlyPlaying, FADE, \"stop\")
 		currentlyPlaying = musicDict.get(key)
-		$MusicCrossFade.interpolate_property(currentlyPlaying, \"volume_db\", -80, currentlyPlaying.volume_db, FADE, Tween.TRANS_EXPO, Tween.EASE_OUT)
+		$MusicCrossFade.interpolate_property(currentlyPlaying, \"volume_db\", -80, 0, FADE, Tween.TRANS_EXPO, Tween.EASE_OUT)
 		$MusicCrossFade.interpolate_callback(currentlyPlaying, 0.1, \"play\")
 		$MusicCrossFade.start()
 "
